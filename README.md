@@ -19,6 +19,7 @@ In head project:
   - [ ] dark mode (option later.  Fine right now)
   - dropdown "new menu" in index
   - navigation bar
+  - common template with navigation bar included
 [ ] about page
 [ ] add history log
     - date changed
