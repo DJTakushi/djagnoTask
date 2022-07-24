@@ -5,6 +5,8 @@ from . import views
 app_name = 'djangoTask'
 urlpatterns = [
     path('', views.index, name='index'),
+    path('about', views.about, name='about'),
+    path('blank', views.blank, name='blank'),
     # path('<int:todo_id>/status/', views.index, name='status'),
     # path('<int:todo_id>/', views.index, name='status'),
     # path('<int:todo_id>/editPost/', views.index, name='status'),

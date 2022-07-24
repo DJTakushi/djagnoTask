@@ -15,6 +15,14 @@ def index(request):
         'latest_todo_list':todo_list,
     }
     return HttpResponse(template.render(context,request))
+def blank(request):
+    template = loader.get_template('djangoTask/blank.html')
+    context = {}
+    return HttpResponse(template.render(context,request))
+def about(request):
+    template = loader.get_template('djangoTask/about.html')
+    context = {}
+    return HttpResponse(template.render(context,request))
 
 # Generic views work, but I think the offer less control
 # class DetailView(generic.DetailView):

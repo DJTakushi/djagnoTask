@@ -33,35 +33,10 @@
         </li>
       </ul>
     </nav>
+  </div>
 
-    {% if latest_todo_list %}
-    <div class="container-fluid">
-      <table class="table table-dark table-striped table-hover table-sm">
-        <!-- <caption>todos</caption> -->
-        <thead>
-          <tr>
-            <th>id</th>
-            <th>title</th>
-            <th>status</th>
-            <th>due date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for todo in latest_todo_list %}
-          <tr>
-            <td>{{ todo.id}}</td>
-            <td><a href="{% url 'djangoTask:detail' todo.id %}">{{ todo.title }}</a></td>
-            <td>{{ todo.status}}</td>
-            <td>{{ todo.getDueDate }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    {% else %}
-    <p>No todos are available.</p>
-    {% endif %}
-  </div>  <canvas class="background"></canvas>
+
+  <canvas class="background"></canvas>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particlesjs/2.2.2/particles.min.js"></script>
   <script src="{% static 'djangoTask/takushi.js' %}"></script>
