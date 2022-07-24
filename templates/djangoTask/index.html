@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Todo Index</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+  {% load static %}
+
+  <link rel="stylesheet" type="text/css" href="{% static 'djangoTask/style.css' %}">
+</head>
+
+<body>
+  <div class="cover-container d-flex h-100 p-3 mx-auto flex-column containerParticle">
+
+    <nav class="navbar navbar-expand navbar-light bg-light">
+      <a class="navbar-brand" href="#">Navbar</a>
+      <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button> -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Pricing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#">Disabled</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <!-- <button type="button" onclick="">New</button> -->
+      <a class="t" href="{% url 'djangoTask:new' %}">Create new todo</a>
+    </div>
+
+    {% if latest_todo_list %}
+    <div class="container-fluid">
+      <table class="table table-dark table-striped table-hover table-sm">
+        <!-- <caption>todos</caption> -->
+        <thead>
+          <tr>
+            <th>id</th>
+            <th>title</th>
+            <th>status</th>
+            <th>due date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for todo in latest_todo_list %}
+          <tr>
+            <td>{{ todo.id}}</td>
+            <td><a href="{% url 'djangoTask:detail' todo.id %}">{{ todo.title }}</a></td>
+            <td>{{ todo.status}}</td>
+            <td>{{ todo.getDueDate }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p>No todos are available.</p>
+    {% endif %}
+
+  </div>
+  <canvas class="background"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particlesjs/2.2.2/particles.min.js"></script>
+  <script src="{% static 'djangoTask/takushi.js' %}"></script>
+
+</body>
+
+</html>

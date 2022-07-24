@@ -1,0 +1,70 @@
+/* body { */
+/* background: white url("images/background.jpg") no-repeat; */
+/* background-image: linear-gradient(navy,purple); */
+/* } */
+body {
+  /* background-color: red; */
+  /* warm */
+  /* background-image: linear-gradient(to bottom right, rgba(127,0,0,1), rgba(127,127,0,1)); */
+  /* background-image: linear-gradient(to right, rgba(255,0,0,0), rgba(255,0,0,1)); */
+  /* https://www.w3schools.com/css/css3_gradients.asp */
+  Height: 100vh;
+  /*https://www.reddit.com/r/css/comments/a6g2tx/how_do_i_create_a_gradient_background_that/ */
+  /* background: rgb(2,0,36); */
+  /* cool gradient generated from https://cssgradient.io/ */
+  --tcb: rgb(2, 0, 36);
+  --cGradient1: rgba(2, 0, 36, 1);
+  --cGradient2: rgba(9, 9, 121, 1);
+  --cGradient3: rgba(0, 212, 255, 1);
+  /* background: var(--tcb); */
+  /* background: linear-gradient(-45deg, var(--cGradient1) 0%, var(--cGradient2) 35%, var(--cGradient3) 100%); */
+}
+
+/* https://www.w3schools.com/css/tryit.asp?filename=trycss_link_advanced */
+.t:link, .t:visited {
+  background-color: #f44336;
+  color: white;
+  padding: 14px 25px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.t:hover, .t:active {
+  background-color: red;
+}
+
+/* .button {
+  background-color: ;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+} */
+.background {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+
+.containerParticle {
+  /* max-width: 500px; */
+  margin: 0 auto;
+  padding: 50px;
+  /* background-color: #fff; */
+  box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.06), 0 1px 0 0 rgba(0, 0, 0, 0.02);
+}
+
+
+window.onload = function() {
+  Particles.init
+({
+    selector:'.background'
+  });
+};
