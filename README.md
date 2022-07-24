@@ -6,7 +6,7 @@ Update project per [https://docs.djangoproject.com/en/4.0/intro/tutorial01/](htt
 [ ] make formatting cooler
   - bootstrap theme (themes are expensive - diy garbage)
   - [ ] dark mode (option later.  Fine right now)
-  - dropdown "new menu" in indexe
+  - dropdown "new menu" in index
   - navigation bar
 [ ] about page
 [ ] add history log
