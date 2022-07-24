@@ -35,3 +35,4 @@ In head project:
 [ ] metrics
   - tasks overdue
 [ ] export/import tasks
+[ ] user accounts with tasks owned/shared with each user
