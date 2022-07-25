@@ -15,8 +15,8 @@ def index(request):
         'latest_todo_list':todo_list,
     }
     return HttpResponse(template.render(context,request))
-def blank(request):
-    template = loader.get_template('djangoTask/blank.html')
+def base(request):
+    template = loader.get_template('djangoTask/base.html')
     context = {}
     return HttpResponse(template.render(context,request))
 def about(request):
@@ -36,7 +36,7 @@ def about(request):
 def detailViewNonGeneric(request, todo_id=None):
     context = {
         'todo_id':None,
-        'todo_title':"",
+        'todo_title':"NEW",
         'todo_description':"",
         'todo_creation_date':timezone.now().strftime('%Y-%m-%dT%H:%M'),
         'todo_due_date':timezone.now().strftime('%Y-%m-%dT%H:%M'),
