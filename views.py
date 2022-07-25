@@ -42,6 +42,7 @@ def detailViewNonGeneric(request, todo_id=None):
         'todo_due_date':timezone.now().strftime('%Y-%m-%dT%H:%M'),
         'todo_status':"",
         'todo_tags':"",
+        'navLink':"new",
     }
     if todo_id != None:
         print("todo_id = ",todo_id)
@@ -53,6 +54,8 @@ def detailViewNonGeneric(request, todo_id=None):
         context['todo_due_date']=todo_t.getDueDateTime()
         context['todo_status']=todo_t.status
         context['todo_tags']=todo_t.tags
+        context['navLink']=""
+
 
     template = loader.get_template('djangoTask/detailNonGeneric.html')
     return HttpResponse(template.render(context,request))
