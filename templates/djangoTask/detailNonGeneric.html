@@ -1,52 +1,53 @@
 {% extends "djangoTask/base.html"  %}
 {% block title %}Details - {{ todo_title }} {% endblock %}
 {% block content %}
+<div class="container-content">
+  <div class="container-fluid">
+    <h1>{{ todo_title }}</h1>
+  </div>
 
-<div class="container-fluid">
-  <h1>{{ todo_title }}</h1>
-</div>
+  <div class="container-fluid">
+    {% if todo_id %}
+    <form action="{% url 'djangoTask:editPost' todo_id %}" method="post">
+      {% else %}
+      <form action="{% url 'djangoTask:createPost' %}" method="post">
+        {% endif %}
 
-<div class="container-fluid">
-  {% if todo_id %}
-  <form action="{% url 'djangoTask:editPost' todo_id %}" method="post">
-    {% else %}
-    <form action="{% url 'djangoTask:createPost' %}" method="post">
-      {% endif %}
+        {% csrf_token %}
+        <fieldset>
+          {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-      {% csrf_token %}
-      <fieldset>
-        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+          <table class="table table-dark table-striped table-hover table-sm">
+            <caption>todo fields</caption>
+            <tr>
+              <td>Title</td>
+              <td><input type="text" name="title" id="title" value="{{ todo_title }}"></td>
+            </tr>
+            <tr>
+              <td>Description</td>
+              <td><input type="text" name="descriptionPost" value="{{todo_description}}"></td>
+            </tr>
+            <tr>
+              <td>Creation Date</td>
+              <td><input type="datetime-local" , name="creationDatePost" value="{{todo_creation_date}}"></td>
+            </tr>
+            <tr>
+              <td>Due Date</td>
+              <td><input type="datetime-local" , name="dueDatePost" , value="{{todo_due_date}}"></td>
+            </tr>
+            <tr>
+              <td>Status</td>
+              <td><input type="text" name="statusPost" , value="{{todo_status}}"></td>
+            </tr>
+            <tr>
+              <td>Tags</td>
+              <td><input type="text" name="tagsPost" , value="{{todo_tags}}"></td>
+            </tr>
+          </table>
+        </fieldset>
+        <input type="submit" value="save">
+      </form>
+  </div>
+  {% endblock %}
 
-        <table class="table table-dark table-striped table-hover table-sm">
-          <caption>todo fields</caption>
-          <tr>
-            <td>Title</td>
-            <td><input type="text" name="title" id="title" value="{{ todo_title }}"></td>
-          </tr>
-          <tr>
-            <td>Description</td>
-            <td><input type="text" name="descriptionPost" value="{{todo_description}}"></td>
-          </tr>
-          <tr>
-            <td>Creation Date</td>
-            <td><input type="datetime-local" , name="creationDatePost" value="{{todo_creation_date}}"></td>
-          </tr>
-          <tr>
-            <td>Due Date</td>
-            <td><input type="datetime-local" , name="dueDatePost" , value="{{todo_due_date}}"></td>
-          </tr>
-          <tr>
-            <td>Status</td>
-            <td><input type="text" name="statusPost" , value="{{todo_status}}"></td>
-          </tr>
-          <tr>
-            <td>Tags</td>
-            <td><input type="text" name="tagsPost" , value="{{todo_tags}}"></td>
-          </tr>
-        </table>
-      </fieldset>
-      <input type="submit" value="save">
-    </form>
-    {% endblock %}
-
-    {% block navActive %} "{{ navLink }}" {% endblock %}
+  {% block navActive %} "{{ navLink }}" {% endblock %}

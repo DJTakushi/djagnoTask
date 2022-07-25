@@ -15,11 +15,11 @@ In head project:
 
 # Todo
 [ ] make formatting cooler
-  - bootstrap theme (themes are expensive - diy garbage)
+  - [x] bootstrap theme (themes are expensive - diy garbage)
   - [ ] dark mode (option later.  Fine right now)
-  - dropdown "new menu" in index
-  - navigation bar
-  - common template with navigation bar included
+  - ~~dropdown "new menu" in index~~ (new page is alright for now)
+  - [x] navigation bar
+  - [x] common template with navigation bar included
 [ ] about page
 [ ] add history log
     - date changed

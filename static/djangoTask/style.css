@@ -33,7 +33,12 @@ body {
 .t:hover, .t:active {
   background-color: red;
 }
+.navbar {
+  border-radius:5px;
+  padding: 10px;
 
+  box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.06), 0 1px 0 0 rgba(0, 0, 0, 0.02);
+}
 .nav-link{
   border-radius: 5px;
 }
@@ -43,6 +48,13 @@ body {
 }
 .nav-link:hover{
   background-color:orange;
+}
+.container-content{
+  z-index: 1;
+  opacity:.9;
+  padding: 10px;
+  background-color: #fff;
+  box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.06), 0 1px 0 0 rgba(0, 0, 0, 0.02);
 }
 .background {
   position: absolute;
