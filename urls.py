@@ -8,6 +8,7 @@ urlpatterns = [
     path('about', views.about, name='about'),
     path('base', views.base, name='base'),
     path('import', views.importData, name='import'),
+    path('export', views.exportData, name='export'),
     # path('<int:todo_id>/status/', views.index, name='status'),
     # path('<int:todo_id>/', views.index, name='status'),
     # path('<int:todo_id>/editPost/', views.index, name='status'),

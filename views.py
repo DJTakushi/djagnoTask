@@ -38,6 +38,14 @@ def importData(request):
 
     return HttpResponse(template.render(context,request))
 
+def exportData(request):
+    template = loader.get_template('djangoTask/export.html')
+    context = {}
+    export = ""
+    export = "failed to get export data"
+    context['export']=export
+    return HttpResponse(template.render(context,request))
+
 # Generic views work, but I think the offer less control
 # class DetailView(generic.DetailView):
 #     model = todo
