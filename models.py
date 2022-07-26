@@ -78,7 +78,21 @@ class todoManager(models.Manager):
         except:
             output+="JSON input could not be parsed."
         return output
+    def getJson(self):
+        ### creates json export of all todos
+        output = "{"
+        # print(self.all())
+        # output +=
+        todoList =todo.objects.all()
+        # todo0=todoList[0]
+        # print(todo0.getAsDict())
+        for i in todo.objects.all():
+            output += json.dumps(i.getAsDict())
 
+        # if output[-1] == ",":
+        #     output = output[:-1]
+        output+="}"
+        return output
 
 class todo(models.Model):
     title=models.CharField(max_length=200)
@@ -146,10 +160,13 @@ class todo(models.Model):
 
     def convertToDateTimeFormat(self,i, option = ""):
         output = ""
-        if option == "dateOnly":
-            output = i.strftime('%Y-%m-%d')
-        else:
-            output = i.strftime('%Y-%m-%dT%H:%M')
+        try:
+            if option == "dateOnly":
+                output = i.strftime('%Y-%m-%d')
+            else:
+                output = i.strftime('%Y-%m-%dT%H:%M %z')
+        except:
+            output+= ""
         return output
 
     def getCreationDate(self):
@@ -169,3 +186,13 @@ class todo(models.Model):
 
     def getDueDateTime(self):
         return self.convertToDateTimeFormat(self.due_date)
+
+    def getAsDict(self):
+        output = {}
+        output['title']=self.title
+        output['description']=self.description
+        output['creation_date']=self.getCreationDateTime()
+        output['due_date']=self.getDueDateTime()
+        output['status']=self.status
+        output['tags']=self.tags
+        return output

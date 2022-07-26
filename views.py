@@ -5,7 +5,7 @@ from .models import todo, todoManager
 from django.views import generic
 from django.urls import reverse
 from django.utils import timezone
-
+import json
 from django.template import loader
 
 def index(request):
@@ -42,7 +42,10 @@ def exportData(request):
     template = loader.get_template('djangoTask/export.html')
     context = {}
     export = ""
-    export = "failed to get export data"
+    try:
+        export = todo.objects.getJson()
+    except:
+        export = "failed to get export data"
     context['export']=export
     return HttpResponse(template.render(context,request))
 
