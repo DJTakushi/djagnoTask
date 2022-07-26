@@ -47,6 +47,13 @@
         </fieldset>
         <input type="submit" value="save">
       </form>
+      {% if todo_id %}
+      <form action="{% url 'djangoTask:delete' todo_id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="delete">
+      </form>
+      {% endif %}
+
   </div>
   {% endblock %}
 

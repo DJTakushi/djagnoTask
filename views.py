@@ -70,13 +70,20 @@ def detailViewNonGeneric(request, todo_id=None):
         'navLink':"new",
     }
     if todo_id != None:
-        print("todo_id = ",todo_id)
         todo_t = get_object_or_404(todo, pk=todo_id)
         context['todo_id']=todo_t.id
         context['todo_title']=todo_t.title
         context['todo_description']=todo_t.description
-        context['todo_creation_date']=todo_t.getCreationDateTime()
-        context['todo_due_date']=todo_t.getDueDateTime()
+        try:
+            context['todo_creation_date']=todo_t.creation_date.strftime('%Y-%m-%dT%H:%M')
+        except:
+            context['todo_creation_date']=""
+
+        try:
+            context['todo_due_date']=todo_t.due_date.strftime('%Y-%m-%dT%H:%M')
+        except:
+            context['todo_due_date']=""
+
         context['todo_status']=todo_t.status
         context['todo_tags']=todo_t.tags
         context['navLink']=""
@@ -91,20 +98,25 @@ def status(request, todo_id):
 def editPost(request, todo_id=None):
     if todo_id == None:
         todo_t = todo()
-        todo_t.title = request.POST['title']
-        todo_t.description = request.POST['descriptionPost']
-        todo_t.creation_date = request.POST['creationDatePost']
-        todo_t.due_date = request.POST['dueDatePost']
-        todo_t.status = request.POST['statusPost']
-        todo_t.tags = request.POST['tagsPost']
+        todo_t.setTitle(request.POST['title'])
+        todo_t.setDescription(request.POST['descriptionPost'])
+        todo_t.setCreationDateFromString(request.POST['creationDatePost'])
+        todo_t.setDueDateFromString(request.POST['dueDatePost'])
+        todo_t.setStatus(request.POST['statusPost'])
+        todo_t.setTags(request.POST['tagsPost'])
         todo_t.save()
     else:
         todo_t = get_object_or_404(todo, pk=todo_id)
-        todo_t.title = request.POST['title']
-        todo_t.description = request.POST['descriptionPost']
-        todo_t.creation_date = request.POST['creationDatePost']
-        todo_t.due_date = request.POST['dueDatePost']
-        todo_t.status = request.POST['statusPost']
-        todo_t.tags = request.POST['tagsPost']
+        todo_t.setTitle(request.POST['title'])
+        todo_t.setDescription(request.POST['descriptionPost'])
+        todo_t.setCreationDateFromString(request.POST['creationDatePost'])
+        todo_t.setDueDateFromString(request.POST['dueDatePost'])
+        todo_t.setStatus(request.POST['statusPost'])
+        todo_t.setTags(request.POST['tagsPost'])
         todo_t.save()
+    return HttpResponseRedirect(reverse('djangoTask:index'))
+
+def deletePost(request, todo_id=None):
+    todo_t = get_object_or_404(todo, pk=todo_id)
+    todo_t.delete()
     return HttpResponseRedirect(reverse('djangoTask:index'))

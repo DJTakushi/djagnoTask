@@ -1,6 +1,7 @@
 from django.db import models
 import json
 from django.utils import timezone
+from datetime import datetime
 
 def dictToString(context):
     output = ""
@@ -13,7 +14,6 @@ def dictToString(context):
         output +="}"
     except:
         output+="dictToString Failed!"
-        print(context)
     return output
 
 class todoManager(models.Manager):
@@ -33,12 +33,12 @@ class todoManager(models.Manager):
                 output += todo_t.setDescription("")
 
             try:
-                output += todo_t.setCreationDate(context['creation_date'])
+                output += todo_t.setCreationDateFromString(context['creation_date'])
             except:
-                output += todo_t.setCreationDate(timezone.now().strftime('%Y-%m-%dT%H:%M %z'))
+                output += todo_t.setCreationDate(datetime.utcnow())
 
             try:
-                output += todo_t.setDueDate(context['due_date'])
+                output += todo_t.setDueDateFromString(context['due_date'])
             except:
                 print("no due-date specified.  Will remain Null")
 
@@ -55,8 +55,7 @@ class todoManager(models.Manager):
         except:
             output+= "could not create from " + dictToString(context)
             print("create_todo() failed.")
-
-        print("output = ", output)
+        # print("output = ", output)
         return output
     def createFromJson(self, inText):
         output = ""
@@ -81,16 +80,9 @@ class todoManager(models.Manager):
     def getJson(self):
         ### creates json export of all todos
         output = "{"
-        # print(self.all())
-        # output +=
         todoList =todo.objects.all()
-        # todo0=todoList[0]
-        # print(todo0.getAsDict())
         for i in todo.objects.all():
             output += json.dumps(i.getAsDict())
-
-        # if output[-1] == ",":
-        #     output = output[:-1]
         output+="}"
         return output
 
@@ -124,21 +116,41 @@ class todo(models.Model):
         except:
             output = "could not set description with input " + i
         return output
-    def setCreationDate(self,i):
+    def setCreationDate(self,i): #from datetime param
         output = ""
         try:
             self.creation_date = i
             self.save()
         except:
+            self.creation_date = None
             output = "could not set creation date with input " + i
         return output
+    def setCreationDateFromString(self,i):
+        output = ""
+        try:
+            tz_t = "+00:00" #TODO: refine timezones for local lookup
+            dateTime_t = datetime.fromisoformat(i+tz_t)
+            output =  self.setCreationDate(dateTime_t)
+        except:
+            output += "setCreationDateFromString() failed"
+        return
     def setDueDate(self,i):
         output = ""
         try:
             self.due_date = i
             self.save()
         except:
+            self.due_date = None
             output = "could not set due date with input " + i
+        return output
+    def setDueDateFromString(self,i):
+        output = ""
+        try:
+            tz_t = "+00:00" #TODO: refine timezones for local lookup
+            dateTime_t = datetime.fromisoformat(i+tz_t)
+            output = self.setDueDate(dateTime_t)
+        except:
+            output += "setDueDateFromString() failed"
         return output
     def setStatus(self,i):
         output = ""
@@ -157,42 +169,18 @@ class todo(models.Model):
             output = "could not set tags with input " + i
         return output
 
-
-    def convertToDateTimeFormat(self,i, option = ""):
-        output = ""
-        try:
-            if option == "dateOnly":
-                output = i.strftime('%Y-%m-%d')
-            else:
-                output = i.strftime('%Y-%m-%dT%H:%M %z')
-        except:
-            output+= ""
-        return output
-
-    def getCreationDate(self):
-        return self.convertToDateTimeFormat(self.creation_date, "dateOnly")
-
-    def getCreationDateTime(self):
-        return self.convertToDateTimeFormat(self.creation_date)
-
-    def getDueDate(self):
-        output=""
-        try:
-            output = self.convertToDateTimeFormat(self.due_date, "dateOnly")
-        except:
-            output += "getDueDate() failed"
-            # print("getDueDate() failed")
-        return output
-
-    def getDueDateTime(self):
-        return self.convertToDateTimeFormat(self.due_date)
-
     def getAsDict(self):
         output = {}
         output['title']=self.title
         output['description']=self.description
-        output['creation_date']=self.getCreationDateTime()
-        output['due_date']=self.getDueDateTime()
+        try: # dates may be null
+            output['creation_date']=self.creation_date.isoformat()
+        except:
+            pass
+        try:
+            output['due_date']=self.due_date.isoformat()
+        except:
+            pass
         output['status']=self.status
         output['tags']=self.tags
         return output
