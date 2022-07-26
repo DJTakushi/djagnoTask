@@ -1,0 +1,20 @@
+{% extends "djangoTask/base.html"  %}
+{% block title %}import{% endblock %}
+{% block navActive %}"import"{% endblock %}
+{% block content %}
+<div class="container-content">
+  <div class="container-fluid">
+    <p>{{ message }}</p>
+  </div>
+
+  <div class="container-fluid">
+      <form action="{% url 'djangoTask:import' %}" method="post">
+        {% csrf_token %}
+        <fieldset>
+          {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+          <textarea name="inData" id="inData" value="{{ inData }}" rows="4" cols="50">{{ dataProvided }}</textarea>
+        </fieldset>
+        <input type="submit" value="save">
+      </form>
+  </div>
+{% endblock %}

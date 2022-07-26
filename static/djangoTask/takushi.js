@@ -13,5 +13,8 @@ function setActiveNavLink(id){
   if (element != null){
     element.className+=" nav-link-active";
   }
+  else{
+    console.log("setActiveNavLink could not find the id to set active(?)")    
+  }
   console.log("ran setActiveNavLink")
 }

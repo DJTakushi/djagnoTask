@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import todo
+from .models import todo, todoManager
 from django.views import generic
 from django.urls import reverse
 from django.utils import timezone
@@ -22,6 +22,19 @@ def base(request):
 def about(request):
     template = loader.get_template('djangoTask/about.html')
     context = {}
+    return HttpResponse(template.render(context,request))
+def importData(request):
+    template = loader.get_template('djangoTask/import.html')
+    inData=""
+    context={}
+    if 'inData' in request.POST:
+        inData=request.POST['inData']
+        reply=todo.objects.createFromJson(inData)
+        context['message']="reply: "+reply
+    else:
+        context['message']="Input data in text box or by upload"
+    context['dataProvided']=inData
+
     return HttpResponse(template.render(context,request))
 
 # Generic views work, but I think the offer less control
