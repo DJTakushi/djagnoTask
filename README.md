@@ -20,19 +20,30 @@ In head project:
   - ~~dropdown "new menu" in index~~ (new page is alright for now)
   - [x] navigation bar
   - [x] common template with navigation bar included
-[ ] about page
-[ ] add history log
-    - date changed
-    - old value
-    - new value
-[ ] add delete button (changes status to 'deleted')
-[ ] add 'comment' field
-[ ] add 'complete' button
-  - changes status to 'completed'
-  - prompts user for message that will be added to "comment"
-[ ] add attachment
-  - if picture, display
-[ ] metrics
-  - tasks overdue
-[ ] export/import tasks
-[ ] user accounts with tasks owned/shared with each user
+[x] about page
+[ ] features
+  [ ] model
+    [ ] add history log
+        - date changed
+        - old value
+        - new value
+    [ ] add delete button (changes status to 'deleted')
+    [ ] add 'comment' field
+    [ ] add 'complete' button
+      - changes status to 'completed'
+      - prompts user for message that will be added to "comment"
+    [ ] add attachment
+      - if picture, display
+    [ ] metrics
+      - tasks overdue
+  [ ] export/import tasks
+    - import:
+      - importData(inText) # inText = text of file
+        - convert to json
+        - iterate through list and create new todo (if one does not already exist from ID)
+
+  [ ] user accounts with tasks owned/shared with each user
+[ ] publish to some platform
+[ ] tests
+[ ] import this markdown into "about" page
+[ ] [package](https://docs.djangoproject.com/en/4.0/intro/reusable-apps/)
