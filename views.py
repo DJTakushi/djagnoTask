@@ -31,9 +31,10 @@ def importData(request):
         inData=request.POST['inData']
         reply=todo.objects.createFromJson(inData)
         context['message']="reply: "+reply
+        context['dataProvided']=inData
     else:
-        context['message']="Input data in text box or by upload"
-    context['dataProvided']=inData
+        context['message']="Input data in text box or by upload (example below)"
+        context['dataProvided']="[{\"title\":\"sampleTitle\"},{\"title\":\"sampleTitle2\",\"description\":\"dummyDesc\"}]"
 
     return HttpResponse(template.render(context,request))
 
