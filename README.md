@@ -45,5 +45,5 @@ In head project:
   [ ] user accounts with tasks owned/shared with each user
 [ ] publish to some platform
 [ ] tests
-[ ] import this markdown into "about" page
+[x] ~~import this markdown into "about" page~~ - no, about should be for presentation, not development.
 [ ] [package](https://docs.djangoproject.com/en/4.0/intro/reusable-apps/)
