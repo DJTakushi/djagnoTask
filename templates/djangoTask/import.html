@@ -12,7 +12,7 @@
         {% csrf_token %}
         <fieldset>
           {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-          <textarea name="inData" id="inData" value="{{ inData }}" rows="4" cols="50">{{ dataProvided }}</textarea>
+          <textarea name="inData" id="inData" value="{{ inData }}" rows="20" cols="100">{{ dataProvided }}</textarea>
         </fieldset>
         <input type="submit" value="save">
       </form>
