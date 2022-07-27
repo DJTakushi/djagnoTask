@@ -25,7 +25,6 @@ class todoManager(models.Manager):
 
             todo_t = self.create()
             output += todo_t.setTitle(title_t)
-            print("create_todo() succeeded!")
 
             try:
                 output += todo_t.setDescription(context['description'])
@@ -35,12 +34,12 @@ class todoManager(models.Manager):
             try:
                 output += todo_t.setCreationDateFromString(context['creation_date'])
             except:
-                output += todo_t.setCreationDate(datetime.utcnow())
+                output += todo_t.setCreationDate(datetime.now(timezone.utc))
 
             try:
                 output += todo_t.setDueDateFromString(context['due_date'])
             except:
-                print("no due-date specified.  Will remain Null")
+                output +="no due-date specified.  Will remain Null"
 
             try:
                 output += todo_t.setStatus(context['status'])
@@ -133,10 +132,10 @@ class todo(models.Model):
         try:
             dateTime_t = datetime.fromisoformat(i)
             if not(dateTime_t.tzinfo and (dateTime_t.tzinfo.utcoffset(dateTime_t)!=None)):
-                print(" dateTime_t doesn't look aware")
+                # print(" dateTime_t doesn't look aware")
                 tz_t = "+00:00" #TODO: refine timezones for local lookup
                 dateTime_t = datetime.fromisoformat(i+tz_t)
-                print("dateTime_t now = ", dateTime_t.isoformat())
+                # print("dateTime_t now = ", dateTime_t.isoformat())
             output =  self.setCreationDate(dateTime_t)
         except:
             output += "setCreationDateFromString() failed"
@@ -154,12 +153,12 @@ class todo(models.Model):
         output = ""
         try:
             dateTime_t = datetime.fromisoformat(i)
-            print("dateTime_t = ", dateTime_t.isoformat())
+            # print("dateTime_t = ", dateTime_t.isoformat())
             if not(dateTime_t.tzinfo and (dateTime_t.tzinfo.utcoffset(dateTime_t)!=None)):
-                print(" dateTime_t doesn't look aware")
+                # print(" dateTime_t doesn't look aware")
                 tz_t = "+00:00" #TODO: refine timezones for local lookup
                 dateTime_t = datetime.fromisoformat(i+tz_t)
-                print("dateTime_t now = ", dateTime_t.isoformat())
+                # print("dateTime_t now = ", dateTime_t.isoformat())
             output = self.setDueDate(dateTime_t)
         except:
             output += "setDueDateFromString() failed"
