@@ -79,11 +79,14 @@ class todoManager(models.Manager):
         return output
     def getJson(self):
         ### creates json export of all todos
-        output = "{"
+        output = "["
         todoList =todo.objects.all()
         for i in todo.objects.all():
             output += json.dumps(i.getAsDict())
-        output+="}"
+            output +=","
+        if output[-1]==",":
+            output=output[:-1]
+        output+="]"
         return output
 
 class todo(models.Model):
@@ -128,12 +131,16 @@ class todo(models.Model):
     def setCreationDateFromString(self,i):
         output = ""
         try:
-            tz_t = "+00:00" #TODO: refine timezones for local lookup
-            dateTime_t = datetime.fromisoformat(i+tz_t)
+            dateTime_t = datetime.fromisoformat(i)
+            if not(dateTime_t.tzinfo and (dateTime_t.tzinfo.utcoffset(dateTime_t)!=None)):
+                print(" dateTime_t doesn't look aware")
+                tz_t = "+00:00" #TODO: refine timezones for local lookup
+                dateTime_t = datetime.fromisoformat(i+tz_t)
+                print("dateTime_t now = ", dateTime_t.isoformat())
             output =  self.setCreationDate(dateTime_t)
         except:
             output += "setCreationDateFromString() failed"
-        return
+        return output
     def setDueDate(self,i):
         output = ""
         try:
@@ -146,8 +153,13 @@ class todo(models.Model):
     def setDueDateFromString(self,i):
         output = ""
         try:
-            tz_t = "+00:00" #TODO: refine timezones for local lookup
-            dateTime_t = datetime.fromisoformat(i+tz_t)
+            dateTime_t = datetime.fromisoformat(i)
+            print("dateTime_t = ", dateTime_t.isoformat())
+            if not(dateTime_t.tzinfo and (dateTime_t.tzinfo.utcoffset(dateTime_t)!=None)):
+                print(" dateTime_t doesn't look aware")
+                tz_t = "+00:00" #TODO: refine timezones for local lookup
+                dateTime_t = datetime.fromisoformat(i+tz_t)
+                print("dateTime_t now = ", dateTime_t.isoformat())
             output = self.setDueDate(dateTime_t)
         except:
             output += "setDueDateFromString() failed"
