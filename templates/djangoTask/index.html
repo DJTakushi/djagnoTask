@@ -24,7 +24,9 @@
         <td><a href="{% url 'djangoTask:detail' todo.id %}">(no title)</a></td>
         {% endif %}
         <td>{{ todo.status}}</td>
-        <td>{{ todo.due_date.date }}</td>
+        <!-- <td>{{ todo.due_date.date }}</td> -->
+        <!-- <td>{{ todo.getDueDate }}</td> -->
+        <td>{{ todo.due_date.date.isoformat }}</td>
         <td>
           <form action="{% url 'djangoTask:delete' todo.id %}" method="post">
             {% csrf_token %}

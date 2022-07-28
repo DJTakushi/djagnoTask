@@ -16,6 +16,16 @@ def dictToString(context):
         output+="dictToString Failed!"
     return output
 
+jsonExample = {}
+jsonExample['title'] = "Sample Title"
+jsonExample['description'] = "sample description"
+jsonExample['creation_date'] = "2022-07-27T17:00:00+00:00"
+jsonExample['due_date'] = "2022-08-07T17:00:00+00:00"
+jsonExample['status'] = "pending"
+jsonExample['tags'] = "tf69"
+jsonExampleImportString="["+dictToString(jsonExample)+"]"
+# "[{\"title\": \"Sample Title\", \"description\": \"sample description\", \"creation_date\": \"2022-07-27T17:00:00+00:00\", \"due_date\": \"2022-07-27T17:00:00+00:00\", \"status\": \"pending\", \"tags\": \"TF69\"}]"
+
 class todoManager(models.Manager):
     def create_todo(self, context):
         output = ""
@@ -59,18 +69,18 @@ class todoManager(models.Manager):
     def createFromJson(self, inText):
         output = ""
         try:
-            print(inText)
+            # print(inText)
             d = json.loads(inText)
-            print(d)
+            # print(d)
             objectsOriginal=len(self.all())
             if len(d) > 0:
                 for i in d:
-                    print(i)
+                    # print(i)
                     output += self.create_todo(i)
             else:
                 print("no valid json objects found")
             objectsCreated= len(self.all())-objectsOriginal
-            print("todo objects:", objectsCreated )
+            # print("todo objects:", objectsCreated )
 
             output += " Created "+str(objectsCreated)+" todos"
         except:

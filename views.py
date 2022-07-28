@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import todo, todoManager
+from .models import todo, todoManager, jsonExample, dictToString, jsonExampleImportString
 from django.views import generic
 from django.urls import reverse
 from django.utils import timezone
@@ -34,7 +34,8 @@ def importData(request):
         context['dataProvided']=inData
     else:
         context['message']="Input data in text box or by upload (example below)"
-        context['dataProvided']="[{\"title\":\"sampleTitle\"},{\"title\":\"sampleTitle2\",\"description\":\"dummyDesc\"}]"
+        # context['dataProvided']=jsonExample
+    context['example']=jsonExampleImportString
 
     return HttpResponse(template.render(context,request))
 
@@ -99,20 +100,20 @@ def editPost(request, todo_id=None):
     if todo_id == None:
         todo_t = todo()
         todo_t.setTitle(request.POST['title'])
-        todo_t.setDescription(request.POST['descriptionPost'])
-        todo_t.setCreationDateFromString(request.POST['creationDatePost'])
-        todo_t.setDueDateFromString(request.POST['dueDatePost'])
-        todo_t.setStatus(request.POST['statusPost'])
-        todo_t.setTags(request.POST['tagsPost'])
+        todo_t.setDescription(request.POST['description'])
+        todo_t.setCreationDateFromString(request.POST['creationDate'])
+        todo_t.setDueDateFromString(request.POST['dueDate'])
+        todo_t.setStatus(request.POST['status'])
+        todo_t.setTags(request.POST['tags'])
         todo_t.save()
     else:
         todo_t = get_object_or_404(todo, pk=todo_id)
         todo_t.setTitle(request.POST['title'])
-        todo_t.setDescription(request.POST['descriptionPost'])
-        todo_t.setCreationDateFromString(request.POST['creationDatePost'])
-        todo_t.setDueDateFromString(request.POST['dueDatePost'])
-        todo_t.setStatus(request.POST['statusPost'])
-        todo_t.setTags(request.POST['tagsPost'])
+        todo_t.setDescription(request.POST['description'])
+        todo_t.setCreationDateFromString(request.POST['creationDate'])
+        todo_t.setDueDateFromString(request.POST['dueDate'])
+        todo_t.setStatus(request.POST['status'])
+        todo_t.setTags(request.POST['tags'])
         todo_t.save()
     return HttpResponseRedirect(reverse('djangoTask:index'))
 
