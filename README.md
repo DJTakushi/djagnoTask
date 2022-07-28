@@ -41,6 +41,7 @@ In head project:
   [ ] user accounts with tasks owned/shared with each user
   [ ] timezone support (default in server and local zone sent by client)
   [ ] API access
+  [ ] keyboard shortcuts
 [ ] publish to some platform
 [x] tests
 [x] ~~import this markdown into "about" page~~ - no, about should be for presentation, not development.
