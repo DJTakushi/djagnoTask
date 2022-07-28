@@ -43,6 +43,7 @@ In head project:
   [ ] API access
   [ ] keyboard shortcuts
 [ ] publish to some platform
+  [ ] convert repo to a full project if Heroku requires it
 [x] tests
 [x] ~~import this markdown into "about" page~~ - no, about should be for presentation, not development.
 [ ] [package](https://docs.djangoproject.com/en/4.0/intro/reusable-apps/)
