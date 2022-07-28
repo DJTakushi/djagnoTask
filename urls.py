@@ -20,7 +20,7 @@ urlpatterns = [
     # path('<int:pk>/', views.DetailView.as_view(), name='detail'),
     path('<int:todo_id>/', views.detailViewNonGeneric, name='detail'),
     path('<int:todo_id>/editPost/', views.editPost, name='editPost'),
-    path('<int:todo_id>/delete/', views.deletePost, name='delete'),
+    path('<delete/', views.deletePost, name='delete'),
     path('createPost', views.editPost, name='createPost'),
     path('new',views.detailViewNonGeneric,name='new'),
 ]

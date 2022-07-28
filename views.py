@@ -117,7 +117,11 @@ def editPost(request, todo_id=None):
         todo_t.save()
     return HttpResponseRedirect(reverse('djangoTask:index'))
 
-def deletePost(request, todo_id=None):
-    todo_t = get_object_or_404(todo, pk=todo_id)
-    todo_t.delete()
+def deletePost(request):
+    try:
+        todo_t = get_object_or_404(todo, pk=request.POST['todo_id'])
+        todo_t.delete()
+    except:
+        # print("could not get todo_t from "+str(request.POST['todo_id']))
+        pass
     return HttpResponseRedirect(reverse('djangoTask:index'))

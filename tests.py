@@ -6,14 +6,14 @@ from .models import todo, todoManager, jsonExample, dictToString, jsonExampleImp
 from datetime import datetime
 
 def createTodoFromExample():
-        todoDict = {}
-        todoDict['title']=jsonExample['title']
-        todoDict['description']=jsonExample['description']
-        todoDict['creation_date']=jsonExample['creation_date']
-        todoDict['due_date']=jsonExample['due_date']
-        todoDict['status']=jsonExample['status']
-        todoDict['tags']=jsonExample['tags']
-        todo.objects.create_todo(todoDict)
+    todoDict = {}
+    todoDict['title']=jsonExample['title']
+    todoDict['description']=jsonExample['description']
+    todoDict['creation_date']=jsonExample['creation_date']
+    todoDict['due_date']=jsonExample['due_date']
+    todoDict['status']=jsonExample['status']
+    todoDict['tags']=jsonExample['tags']
+    todo.objects.create_todo(todoDict)
 
 class index(TestCase):
     def test_basicPage(self):
@@ -29,8 +29,21 @@ class index(TestCase):
         # no table if no todos exist
         self.assertFalse("</table>" in rContent)
 
+    def test_todoInIndex(self):
+        createTodoFromExample()
+        client = Client()
+        response = client.get(reverse('djangoTask:index'))
+        rContent = response.content.decode("utf-8")
+        self.assertTrue("</table>" in rContent)
 
-    def test_todosInIndex(self):
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(jsonExample['title'] in rContent)
+        self.assertTrue(jsonExample['status'] in rContent)
+        self.assertTrue(jsonExample['due_date'][:10] in rContent)
+
+
+
+    def test_multipletodosInIndex(self):
         """ create 99 todos and check that they're all in the table """
         todoDict = {}
         for i in range(1,100):
@@ -260,6 +273,43 @@ class importPost(TestCase):
             self.assertEqual(jsonExample['status'], todo_t.status)
             self.assertEqual(jsonExample['tags'], todo_t.tags)
 
+class deletePost(TestCase):
+    def test_deleteBlank(self):
+        c = Client()
+        postDict = {}
+        postDict['todo_id'] = 1
+        response= c.post(reverse('djangoTask:delete'), postDict, follow=True)
+        self.assertEqual(response.status_code, 200)
+        rContent = response.content.decode("utf-8")
+
+        #should have no todos visible at Index
+        self.assertTrue("<title>Todo Index</title>" in rContent)
+        self.assertTrue("<p>No todos are available.</p>" in rContent)
+
+    def test_delete(self):
+        #add a todo
+        createTodoFromExample()
+
+        # check that the todo shows up in the index
+        c = Client()
+        response = c.get(reverse('djangoTask:index'))
+        rContent = response.content.decode("utf-8")
+        self.assertTrue("</table>" in rContent)
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(jsonExample['title'] in rContent)
+        self.assertTrue(jsonExample['status'] in rContent)
+        self.assertTrue(jsonExample['due_date'][:10] in rContent)
+
+        #delete the todo
+        postDict = {}
+        postDict['todo_id'] = 1
+        response= c.post(reverse('djangoTask:delete'), postDict, follow=True)
+        self.assertEqual(response.status_code, 200)
+        rContent = response.content.decode("utf-8")
+
+        #confirm  no todos visible at Index
+        self.assertTrue("<title>Todo Index</title>" in rContent)
+        self.assertTrue("<p>No todos are available.</p>" in rContent)
 
     # # todo
     #     - posts

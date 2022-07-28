@@ -28,8 +28,9 @@
         <!-- <td>{{ todo.getDueDate }}</td> -->
         <td>{{ todo.due_date.date.isoformat }}</td>
         <td>
-          <form action="{% url 'djangoTask:delete' todo.id %}" method="post">
+          <form action="{% url 'djangoTask:delete' %}" method="post">
             {% csrf_token %}
+            <input type="hidden" name="todo_id" value="{{ todo.id }}">
             <input type="submit" value="delete">
           </form>
         </td>
