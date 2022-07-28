@@ -40,6 +40,7 @@ In head project:
   [ ] import/export with files
   [ ] user accounts with tasks owned/shared with each user
   [ ] timezone support (default in server and local zone sent by client)
+  [ ] API access
 [ ] publish to some platform
 [x] tests
 [x] ~~import this markdown into "about" page~~ - no, about should be for presentation, not development.
