@@ -36,14 +36,11 @@ In head project:
       - if picture, display
     [ ] metrics
       - tasks overdue
-  [ ] export/import tasks
-    - import:
-      - importData(inText) # inText = text of file
-        - convert to json
-        - iterate through list and create new todo (if one does not already exist from ID)
-
+  [x] import/export with strings
+  [ ] import/export with files
   [ ] user accounts with tasks owned/shared with each user
+  [ ] timezone support (default in server and local zone sent by client)
 [ ] publish to some platform
-[ ] tests
+[x] tests
 [x] ~~import this markdown into "about" page~~ - no, about should be for presentation, not development.
 [ ] [package](https://docs.djangoproject.com/en/4.0/intro/reusable-apps/)

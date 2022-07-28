@@ -316,7 +316,7 @@ class deletePost(TestCase):
     #       - [x] create
     #       - [x] edit
     #       - [x] import
-    #       - [ ] delete
+    #       - [x] delete
     #     -Views
     #       - [x] index
     #       - [x] new view
