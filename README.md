@@ -17,6 +17,7 @@ In head project:
 [ ] make formatting cooler
   - [x] bootstrap theme (themes are expensive - diy garbage)
   - [ ] dark mode (option later.  Fine right now)
+  - Inspiration for other pages: https://freefrontend.com/css-animated-backgrounds/
   - ~~dropdown "new menu" in index~~ (new page is alright for now)
   - [x] navigation bar
   - [x] common template with navigation bar included
@@ -49,5 +50,6 @@ In head project:
 [x] ~~import this markdown into "about" page~~ - no, about should be for presentation, not development.
 [ ] [package](https://docs.djangoproject.com/en/4.0/intro/reusable-apps/)
 [ ] add dblog as a subproject
+  - https://www.ajnisbet.com/blog/jekyll-in-django
 [ ] link submodules back to main project
 [ ] AWS deployment (AWS is a useful skill that will likely be worth most small fees.)
