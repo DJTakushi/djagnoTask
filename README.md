@@ -45,9 +45,9 @@ In head project:
 [x] publish to some platform
   [x] convert repo to a full project if Heroku requires it
 [x] tests
-[ ] PostgreSQL docs
-  [ ] confirm commands to set up for Windows
-    - https://python.plainenglish.io/deploy-your-django-app-to-heroku-with-postgresql-eb365ec5eaef seems to fail for Win
-    - https://djangocentral.com/using-postgresql-with-django/ seems to be the way
+[x] PostgreSQL docs
 [x] ~~import this markdown into "about" page~~ - no, about should be for presentation, not development.
 [ ] [package](https://docs.djangoproject.com/en/4.0/intro/reusable-apps/)
+[ ] add dblog as a subproject
+[ ] link submodules back to main project
+[ ] AWS deployment (AWS is a useful skill that will likely be worth most small fees.)
