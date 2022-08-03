@@ -14,6 +14,6 @@ urlpatterns = [
     path('<delete/', views.deletePost, name='delete'),
     path('createPost', views.editPost, name='createPost'),
     path('new',views.detailViewNonGeneric,name='new'),
-    path('api/', views.todo_list),
-    path('api/<int:pk>/', views.todo_detail),
+    path('api/', views.todo_list, name='api'),
+    path('api/<int:pk>/', views.todo_detail, name='apiIdx'),
 ]
