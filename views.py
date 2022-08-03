@@ -148,6 +148,7 @@ def todo_list(request):
             return Response(serializer.data, status=statusRF.HTTP_201_CREATED)
         return Response(serializer.errors, status=statusRF.HTTP_400_BAD_REQUEST)
 @csrf_exempt
+@api_view(['GET', 'PUT', 'DELETE'])
 def todo_detail(request, pk):
     """
     Retrieve, update or delete a code todo.
@@ -155,20 +156,19 @@ def todo_detail(request, pk):
     try:
         todo_t = todo.objects.get(pk=pk)
     except todo.DoesNotExist:
-        return HttpResponse(status=404)
+        return Response(status=statusRF.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
         serializer = todoSerializer(todo_t)
-        return JsonResponse(serializer.data)
+        return Response(serializer.data)
 
     elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = todoSerializer(todo_t, data=data)
+        serializer = todoSerializer(todo_t, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=statusRF.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
         todo_t.delete()
-        return HttpResponse(status=204)
+        return Response(status=statusRF.HTTP_204_NO_CONTENT)
