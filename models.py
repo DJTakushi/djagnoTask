@@ -110,6 +110,9 @@ class todo(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        ordering=['creation_date']
+
     # set functions are good in principal and will be helpful for handling logs later
     def setTitle(self,i):
         # self.title=i

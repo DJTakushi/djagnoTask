@@ -1,12 +1,14 @@
 from django.shortcuts import get_object_or_404, render
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .models import todo, todoManager, jsonExample, dictToString, jsonExampleImportString
 from django.views import generic
 from django.urls import reverse
 from django.utils import timezone
 import json
 from django.template import loader
+from django.views.decorators.csrf import csrf_exempt
+from .serializers import todoSerializer
 
 def index(request):
     todo_list = todo.objects.order_by('creation_date')
@@ -125,3 +127,46 @@ def deletePost(request):
         # print("could not get todo_t from "+str(request.POST['todo_id']))
         pass
     return HttpResponseRedirect(reverse('djangoTask:index'))
+
+@csrf_exempt
+def todo_list(request):
+    """
+    List all todos, or create a new todo.
+    """
+    if request.method == 'GET':
+        todos = todo.objects.all()
+        serializer = todoSerializer(todos, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = todoSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+@csrf_exempt
+def todo_detail(request, pk):
+    """
+    Retrieve, update or delete a code todo.
+    """
+    try:
+        todo_t = todo.objects.get(pk=pk)
+    except todo.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'GET':
+        serializer = todoSerializer(todo_t)
+        return JsonResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = todoSerializer(todo_t, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors, status=400)
+
+    elif request.method == 'DELETE':
+        todo_t.delete()
+        return HttpResponse(status=204)
