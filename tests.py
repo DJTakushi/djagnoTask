@@ -4,6 +4,7 @@ from django.test.utils import setup_test_environment
 from django.urls import reverse
 from .models import todo, todoManager, jsonExample, dictToString, jsonExampleImportString
 from datetime import datetime
+import json
 BASEURL = "todo/"
 
 def createTodoFromExample():
@@ -317,7 +318,7 @@ class deletePost(TestCase):
 
         #delete the todo
         postDict = {}
-        postDict['todo_id'] = 1
+        postDict['todo_id'] = todo.objects.all()[0].id
         response= c.post(reverse('djangoTask:delete'), postDict, follow=True)
         self.assertEqual(response.status_code, 200)
         rContent = response.content.decode("utf-8")
@@ -326,17 +327,34 @@ class deletePost(TestCase):
         self.assertTrue("<title>Todo Index</title>" in rContent)
         self.assertTrue("<p>No todos are available.</p>" in rContent)
 
-    # # todo
-    #     - posts
-    #       - [x] create
-    #       - [x] edit
-    #       - [x] import
-    #       - [x] delete
-    #     -Views
-    #       - [x] index
-    #       - [x] new view
-    #       - [x] detail view
-    #       - [x] about view
-    #       - [x] blank view
-    #       - [x] import
-    #       - [x] export
+class api(TestCase):
+    def test_getRoot(self):
+        createTodoFromExample()
+        c = Client()
+        response = c.get(reverse('djangoTask:api'))
+        self.assertEqual(response.status_code, 200)
+        rContent = response.content.decode("utf-8")
+        d = json.loads(rContent)
+        for i in d:
+            self.assertEqual(jsonExample['title'],i['title'])
+            self.assertEqual(jsonExample['description'],i['description'])
+            # TODO - add these checks back in once timezone handling is corrected
+            # self.assertEqual(jsonExample['creation_date'],i['creation_date'])
+            # self.assertEqual(jsonExample['due_date'],i['due_date'])
+            self.assertEqual(jsonExample['status'],i['status'])
+            self.assertEqual(jsonExample['tags'],i['tags'])
+    def test_getItems(self):
+        createTodoFromExample()
+        id_t = todo.objects.all()[0].id
+        c = Client()
+        response = c.get(reverse('djangoTask:apiIdx', kwargs={'pk': id_t}))
+        self.assertEqual(response.status_code, 200)
+        rContent = response.content.decode("utf-8")
+        d = json.loads(rContent)
+        self.assertEqual(jsonExample['title'],d['title'])
+        self.assertEqual(jsonExample['description'],d['description'])
+        self.assertEqual(jsonExample['status'],d['status'])
+        self.assertEqual(jsonExample['tags'],d['tags'])
+        # TODO - add these checks back in once timezone handling is corrected
+        # self.assertEqual(jsonExample['creation_date'],d['creation_date'])
+        # self.assertEqual(jsonExample['due_date'],d['due_date'])
