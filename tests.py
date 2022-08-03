@@ -375,4 +375,20 @@ class api(TestCase):
         self.assertEqual(jsonExample['creation_date'], todo_t.creation_date.isoformat())
         self.assertEqual(jsonExample['status'], todo_t.status)
         self.assertEqual(jsonExample['tags'], todo_t.tags)
-        
+
+class apiIdx(TestCase):
+    def test_get(self):
+        createTodoFromExample()
+        c = Client()
+        id_t = todo.objects.all()[0].id
+        response = c.get(reverse('djangoTask:apiIdx', kwargs={'pk': id_t}))
+        self.assertEqual(response.status_code, 200)
+        d = json.loads(response.content.decode("utf-8"))
+        # print("d = "+str(d))
+        self.assertEqual(jsonExample['title'], d['title'])
+        self.assertEqual(jsonExample['description'], d['description'])
+        # TODO - add these checks back in once timezone handling is corrected
+        # self.assertEqual(jsonExample['due_date'], d['due_date'])
+        # self.assertEqual(jsonExample['creation_date'], d['creation_date'])
+        self.assertEqual(jsonExample['status'], d['status'])
+        self.assertEqual(jsonExample['tags'], d['tags'])
