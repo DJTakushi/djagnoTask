@@ -1,3 +1,4 @@
+from rest_framework import status as statusRF
 from django.shortcuts import get_object_or_404, render
 
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -8,7 +9,9 @@ from django.utils import timezone
 import json
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
 from .serializers import todoSerializer
+from rest_framework.response import Response
 
 def index(request):
     todo_list = todo.objects.order_by('creation_date')
@@ -129,6 +132,7 @@ def deletePost(request):
     return HttpResponseRedirect(reverse('djangoTask:index'))
 
 @csrf_exempt
+@api_view(['GET', 'POST'])
 def todo_list(request):
     """
     List all todos, or create a new todo.
@@ -136,15 +140,13 @@ def todo_list(request):
     if request.method == 'GET':
         todos = todo.objects.all()
         serializer = todoSerializer(todos, many=True)
-        return JsonResponse(serializer.data, safe=False)
-
+        return Response(serializer.data)
     elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = todoSerializer(data=data)
+        serializer = todoSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+            return Response(serializer.data, status=statusRF.HTTP_201_CREATED)
+        return Response(serializer.errors, status=statusRF.HTTP_400_BAD_REQUEST)
 @csrf_exempt
 def todo_detail(request, pk):
     """
