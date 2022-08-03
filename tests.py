@@ -384,7 +384,6 @@ class apiIdx(TestCase):
         response = c.get(reverse('djangoTask:apiIdx', kwargs={'pk': id_t}))
         self.assertEqual(response.status_code, 200)
         d = json.loads(response.content.decode("utf-8"))
-        # print("d = "+str(d))
         self.assertEqual(jsonExample['title'], d['title'])
         self.assertEqual(jsonExample['description'], d['description'])
         # TODO - add these checks back in once timezone handling is corrected
@@ -392,3 +391,28 @@ class apiIdx(TestCase):
         # self.assertEqual(jsonExample['creation_date'], d['creation_date'])
         self.assertEqual(jsonExample['status'], d['status'])
         self.assertEqual(jsonExample['tags'], d['tags'])
+
+
+    def test_put(self):
+        createTodoFromExample()
+        c = Client()
+        id_t = todo.objects.all()[0].id
+        editDict = {}
+        editDict['title'] = "changed title"
+        editDict['creation_date'] = "2020-01-01T01:01:00+0000"
+        editDict['due_date'] = "2020-01-01T01:01:00+0000"
+        editDict['description'] = "new description"
+        editDict['status'] = "new status"
+        editDict['tags'] = "new tags"
+
+        url_t = reverse('djangoTask:apiIdx', kwargs={'pk': id_t})
+        # setting the content_type was necessary and made me insane for >20min
+        response = c.put(url_t,data=editDict,content_type='application/json', follow=True)
+        self.assertEqual(200, response.status_code)
+        d = json.loads(response.content.decode("utf-8"))
+        self.assertEqual(editDict['title'], d['title'])
+        self.assertEqual(editDict['description'], d['description'])
+        self.assertEqual(editDict['creation_date'], d['creation_date'])
+        self.assertEqual(editDict['due_date'], d['due_date'])
+        self.assertEqual(editDict['status'], d['status'])
+        self.assertEqual(editDict['tags'], d['tags'])
