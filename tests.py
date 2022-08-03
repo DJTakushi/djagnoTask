@@ -4,6 +4,7 @@ from django.test.utils import setup_test_environment
 from django.urls import reverse
 from .models import todo, todoManager, jsonExample, dictToString, jsonExampleImportString
 from datetime import datetime
+BASEURL = "todo/"
 
 def createTodoFromExample():
     todoDict = {}
@@ -18,7 +19,7 @@ def createTodoFromExample():
 class index(TestCase):
     def test_basicPage(self):
         client = Client()
-        response = client.get('/')
+        response = client.get(BASEURL)
         self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:index'))
         self.assertEqual(response.status_code, 200)
@@ -45,22 +46,33 @@ class index(TestCase):
 
     def test_multipletodosInIndex(self):
         """ create 99 todos and check that they're all in the table """
-        todoDict = {}
-        for i in range(1,100):
-            todoDict['title']="testTitle"+str(i)
-            todo.objects.create_todo(todoDict)
+        todoList = []
+        todoMax = 99
+        range_t = range(0,todoMax)
+        for i in range_t:
+            dict_t = {}
+            title_t = "testTitle"+str(i)
+            dict_t['title']=title_t
+            todo_t = todo.objects.create_todo(dict_t)
+            lastIdx = len(todo.objects.all()) - 1#last index
+            todo_t = todo.objects.all()[lastIdx]
+            todoList.append({'title':todo_t.title,'id':todo_t.id})
         client = Client()
-        response = client.get(reverse('djangoTask:index'))
+        url_t = reverse('djangoTask:index')
+        response = client.get(url_t)
         rContent = response.content.decode("utf-8")
         self.assertTrue("</table>" in rContent)
-        for i in range(1,100):
-            testString = "<a href=\"/todo/"+str(i)+"/\">testTitle"+str(i)+"</a>"
+        for i in todoList:
+            testString = "<a href=\"/todo/"+str(i['id'])+"/\">"+i['title']+"</a>"
+            # print("checking for "+testString)
+            if testString not in rContent:
+                print("missing :"+testString)
             self.assertTrue(testString in rContent)
 
 class new(TestCase):
     def test_basicPage(self):
         client = Client()
-        response = client.get('/')
+        response = client.get(BASEURL)
         self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:new'))
         self.assertEqual(response.status_code, 200)
@@ -86,9 +98,11 @@ class edit(TestCase):
     def test_basicPage(self):
         createTodoFromExample()
         client = Client()
-        response = client.get('/')
+        response = client.get(BASEURL)
         self.assertEqual(response.status_code, 404)
-        response = client.get(reverse('djangoTask:detail', kwargs={'todo_id': 1}))
+        id_t=todo.objects.all()[0].id # get id from the only existing todo
+        url_t = reverse('djangoTask:detail', kwargs={'todo_id': id_t})
+        response = client.get(url_t)
         self.assertEqual(response.status_code, 200)
         rContent = response.content.decode("utf-8")
         self.assertTrue("<h1>"+jsonExample['title']+"</h1>" in rContent)
@@ -113,7 +127,7 @@ class edit(TestCase):
 class about(TestCase):
     def test_basicPage(self):
         client = Client()
-        response = client.get('/')
+        response = client.get(BASEURL)
         self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:about'))
         self.assertEqual(response.status_code, 200)
@@ -124,7 +138,7 @@ class about(TestCase):
 class base(TestCase):
     def test_basicPage(self):
         client = Client()
-        response = client.get('/')
+        response = client.get(BASEURL)
         self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:base'))
         self.assertEqual(response.status_code, 200)
@@ -135,7 +149,7 @@ class base(TestCase):
 class importPage(TestCase):
     def test_basicPage(self):
         client = Client()
-        response = client.get('/')
+        response = client.get(BASEURL)
         self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:import'))
         self.assertEqual(response.status_code, 200)
@@ -148,7 +162,7 @@ class importPage(TestCase):
 class exportPage(TestCase):
     def test_basicPage(self):
         client = Client()
-        response = client.get('/')
+        response = client.get(BASEURL)
         self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:export'))
         self.assertEqual(response.status_code, 200)
@@ -209,7 +223,8 @@ class editPost(TestCase):
 
         c = Client()
         postContent = jsonExample
-        response= c.post(reverse('djangoTask:editPost', kwargs={'todo_id': 1}), editDict, follow=True)
+        id_t = todo.objects.all()[0].id
+        response= c.post(reverse('djangoTask:editPost', kwargs={'todo_id': id_t}), editDict, follow=True)
 
         # Confirm data in table is correct
         self.assertEqual(200, response.status_code)
