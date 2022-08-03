@@ -5,6 +5,7 @@ from django.urls import reverse
 from .models import todo, todoManager, jsonExample, dictToString, jsonExampleImportString
 from datetime import datetime
 import json
+from rest_framework import status as statusRF
 BASEURL = "todo/"
 
 def createTodoFromExample():
@@ -191,7 +192,7 @@ class newPost(TestCase):
         postContent = jsonExample
         postContent['creationDate']= jsonExample['creation_date'][:16]
         postContent['dueDate']= jsonExample['due_date'][:16]
-        response= c.post(reverse('djangoTask:createPost'), jsonExample, follow=True)
+        response= c.post(reverse('djangoTask:createPost'), postContent, follow=True)
 
         # Confirm data in table is correct
         self.assertEqual(200, response.status_code)
@@ -358,3 +359,20 @@ class api(TestCase):
         # TODO - add these checks back in once timezone handling is corrected
         # self.assertEqual(jsonExample['creation_date'],d['creation_date'])
         # self.assertEqual(jsonExample['due_date'],d['due_date'])
+
+    def test_post(self):
+        c = Client()
+        editDict = {}
+        editDict['title'] = "changed title"
+        editDict['creation_date'] = "2050-01-01T12:00:00+0000"
+        editDict['due_date'] = "2050-01-01T00:00:00+0000" #will not receive
+        response = c.post(reverse('djangoTask:api'), jsonExample, follow=True)
+        self.assertEqual(statusRF.HTTP_201_CREATED, response.status_code)
+        todo_t = todo.objects.all()[0]
+        self.assertEqual(jsonExample['title'], todo_t.title)
+        self.assertEqual(jsonExample['description'], todo_t.description)
+        self.assertEqual(jsonExample['due_date'], todo_t.due_date.isoformat())
+        self.assertEqual(jsonExample['creation_date'], todo_t.creation_date.isoformat())
+        self.assertEqual(jsonExample['status'], todo_t.status)
+        self.assertEqual(jsonExample['tags'], todo_t.tags)
+        
