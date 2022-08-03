@@ -416,3 +416,12 @@ class apiIdx(TestCase):
         self.assertEqual(editDict['due_date'], d['due_date'])
         self.assertEqual(editDict['status'], d['status'])
         self.assertEqual(editDict['tags'], d['tags'])
+
+    def test_delete(self):
+        createTodoFromExample()
+        c = Client()
+        id_t = todo.objects.all()[0].id
+        url_t = reverse('djangoTask:apiIdx', kwargs={'pk': id_t})
+        response = c.delete(url_t, follow=True)
+        self.assertEqual(statusRF.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(0, len(todo.objects.all()))
