@@ -394,9 +394,6 @@ class apiIdx(TestCase):
 
 
     def test_put(self):
-        createTodoFromExample()
-        c = Client()
-        id_t = todo.objects.all()[0].id
         editDict = {}
         editDict['title'] = "changed title"
         editDict['creation_date'] = "2020-01-01T01:01:00+0000"
@@ -404,9 +401,25 @@ class apiIdx(TestCase):
         editDict['description'] = "new description"
         editDict['status'] = "new status"
         editDict['tags'] = "new tags"
+        c = Client()
+
+        # Invalid ID
+        url_t = reverse('djangoTask:apiIdx', kwargs={'pk': 0})
+        # setting the content_type was necessary and made me insane for >20min
+        response = c.put(url_t,data=editDict,content_type='application/json', follow=True)
+        self.assertEqual(404, response.status_code)
+
+
+        createTodoFromExample()
+        id_t = todo.objects.all()[0].id
 
         url_t = reverse('djangoTask:apiIdx', kwargs={'pk': id_t})
-        # setting the content_type was necessary and made me insane for >20min
+        editDict['creation_date'] = "NotARealDate"
+        response = c.put(url_t,data=editDict,content_type='application/json', follow=True)
+        self.assertEqual(400, response.status_code)
+
+        # successful Put
+        editDict['creation_date'] = "2020-01-01T01:01:00+0000"
         response = c.put(url_t,data=editDict,content_type='application/json', follow=True)
         self.assertEqual(200, response.status_code)
         d = json.loads(response.content.decode("utf-8"))
