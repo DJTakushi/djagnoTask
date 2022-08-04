@@ -1,7 +1,7 @@
 from rest_framework import status as statusRF
 from django.shortcuts import get_object_or_404, render
 
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from .models import todo, todoManager, jsonExample, dictToString, jsonExampleImportString
 from django.views import generic
 from django.urls import reverse
@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from .serializers import todoSerializer
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 def index(request):
     todo_list = todo.objects.order_by('creation_date')
@@ -131,44 +132,41 @@ def deletePost(request):
         pass
     return HttpResponseRedirect(reverse('djangoTask:index'))
 
-@csrf_exempt
-@api_view(['GET', 'POST'])
-def todo_list(request, format=None):
+class todoList(APIView):
     """
     List all todos, or create a new todo.
     """
-    if request.method == 'GET':
+    def get(self, request, format=None):
         todos = todo.objects.all()
         serializer = todoSerializer(todos, many=True)
         return Response(serializer.data)
-    elif request.method == 'POST':
+    def post(self,request,fomrat=None):
         serializer = todoSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=statusRF.HTTP_201_CREATED)
         return Response(serializer.errors, status=statusRF.HTTP_400_BAD_REQUEST)
-@csrf_exempt
-@api_view(['GET', 'PUT', 'DELETE'])
-def todo_detail(request, pk, format=None):
+class todoDetail(APIView):
     """
     Retrieve, update or delete a code todo.
     """
-    try:
-        todo_t = todo.objects.get(pk=pk)
-    except todo.DoesNotExist:
-        return Response(status=statusRF.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
+    def get_object(self,pk):
+        try:
+            return todo.objects.get(pk=pk)
+        except todo.DoesNotExist:
+            raise Http404
+    def get(self,request, pk, format=None):
+        todo_t = self.get_object(pk)
         serializer = todoSerializer(todo_t)
         return Response(serializer.data)
-
-    elif request.method == 'PUT':
+    def put(self, request, pk, format=None):
+        todo_t = self.get_object(pk)
         serializer = todoSerializer(todo_t, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=statusRF.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
+    def delete(self, request, pk, format=None):
+        todo_t = self.get_object(pk)
         todo_t.delete()
         return Response(status=statusRF.HTTP_204_NO_CONTENT)

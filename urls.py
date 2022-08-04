@@ -19,8 +19,8 @@ urlpatterns = [
 ]
 
 apiPatterns = [
-    path('api/', views.todo_list, name='api'),
-    path('api/<int:pk>/', views.todo_detail, name='apiIdx'),
+    path('api/', views.todoList.as_view(), name='api'),
+    path('api/<int:pk>/', views.todoDetail.as_view(), name='apiIdx'),
 ]
 apiPatterns=format_suffix_patterns(apiPatterns)
 urlpatterns = urlpatterns+apiPatterns
