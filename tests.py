@@ -392,6 +392,17 @@ class apiIdx(TestCase):
         self.assertEqual(jsonExample['status'], d['status'])
         self.assertEqual(jsonExample['tags'], d['tags'])
 
+        # TODO - add this .api (.html) request once bootstrap loading error is fixed
+        # url_api = reverse('djangoTask:apiIdx', kwargs={'pk': id_t})
+        # url_api = url_api[0:-1]+".api"
+        # print("url_api = ",url_api)
+        # response = c.get(url_api)
+        # self.assertEqual(response.status_code, 200)
+        # rContent = response.content.decode("utf-8")
+        # print(rContent)
+        # self.assertTrue("<html>" in rContent)
+
+
 
     def test_put(self):
         editDict = {}

@@ -1,4 +1,5 @@
 from django.urls import include, path
+from rest_framework.urlpatterns import format_suffix_patterns
 from . import views
 
 app_name = 'djangoTask'
@@ -14,6 +15,12 @@ urlpatterns = [
     path('<delete/', views.deletePost, name='delete'),
     path('createPost', views.editPost, name='createPost'),
     path('new',views.detailViewNonGeneric,name='new'),
+
+]
+
+apiPatterns = [
     path('api/', views.todo_list, name='api'),
     path('api/<int:pk>/', views.todo_detail, name='apiIdx'),
 ]
+apiPatterns=format_suffix_patterns(apiPatterns)
+urlpatterns = urlpatterns+apiPatterns

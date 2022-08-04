@@ -133,7 +133,7 @@ def deletePost(request):
 
 @csrf_exempt
 @api_view(['GET', 'POST'])
-def todo_list(request):
+def todo_list(request, format=None):
     """
     List all todos, or create a new todo.
     """
@@ -149,7 +149,7 @@ def todo_list(request):
         return Response(serializer.errors, status=statusRF.HTTP_400_BAD_REQUEST)
 @csrf_exempt
 @api_view(['GET', 'PUT', 'DELETE'])
-def todo_detail(request, pk):
+def todo_detail(request, pk, format=None):
     """
     Retrieve, update or delete a code todo.
     """
