@@ -2,7 +2,7 @@ from rest_framework import status as statusRF
 from rest_framework import mixins, generics
 from django.shortcuts import get_object_or_404, render
 
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, JsonResponse, Http404
 from .models import todo, todoManager, jsonExample, dictToString, jsonExampleImportString
 from django.views import generic
 from django.urls import reverse
@@ -11,16 +11,29 @@ import json
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
-from .serializers import todoSerializer
+from .serializers import todoSerializer, UserSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.contrib.auth.models import User
+from rest_framework import permissions
+# from .permissions import IsOwnerOrReadOnly
+def returnForbiddenPriviledge(request, msg = None):
+    template = loader.get_template('djangoTask/forbidden.html')
+    context = {}
+    if msg:
+        context = {'message' : msg}
+    return HttpResponseForbidden(template.render(context,request))
 
-def index(request):
+
+def index(request, message=None):
     todo_list = todo.objects.order_by('creation_date')
+    print("request.user = "+str(request.user))
     template = loader.get_template('djangoTask/index.html')
     context = {
         'latest_todo_list':todo_list,
     }
+    if message:
+        context['message'] = message
     return HttpResponse(template.render(context,request))
 def base(request):
     template = loader.get_template('djangoTask/base.html')
@@ -36,9 +49,13 @@ def importData(request):
     context={}
     if 'inData' in request.POST:
         inData=request.POST['inData']
-        reply=todo.objects.createFromJson(inData)
-        context['message']="reply: "+reply
-        context['dataProvided']=inData
+        requiredPerm = 'djangoTask.add_todo'
+        if request.user.has_perm(requiredPerm):
+            reply=todo.objects.createFromJson(inData)
+            context['message']="reply: "+reply
+            context['dataProvided']=inData
+        else:
+            return returnForbiddenPriviledge(request,  "Request requires permission: "+requiredPerm)
     else:
         context['message']="Input data in text box or by upload (example below)"
         # context['dataProvided']=jsonExample
@@ -73,9 +90,11 @@ def detailViewNonGeneric(request, todo_id=None):
         'todo_description':"",
         'todo_creation_date':timezone.now().strftime('%Y-%m-%dT%H:%M'),
         'todo_due_date':timezone.now().strftime('%Y-%m-%dT%H:%M'),
-        'todo_status':"",
+        'todo_status':"open",
         'todo_tags':"",
         'navLink':"new",
+        'createPerm': request.user.has_perm('djangoTask.add_todo'),
+        'changePerm': request.user.has_perm('djangoTask.change_todo'),
     }
     if todo_id != None:
         todo_t = get_object_or_404(todo, pk=todo_id)
@@ -94,6 +113,8 @@ def detailViewNonGeneric(request, todo_id=None):
 
         context['todo_status']=todo_t.status
         context['todo_tags']=todo_t.tags
+        context['todo_owner']=todo_t.owner
+        context['ownerList']=User.objects.all()
         context['navLink']=""
 
 
@@ -104,34 +125,52 @@ def status(request, todo_id):
     return HttpResponse("You're looking at todo %s." % todo_id)
 
 def editPost(request, todo_id=None):
+    context = {}
+    context['msg'] = ""
+    requiredPerm = 'djangoTask.add_todo'
     if todo_id == None:
-        todo_t = todo()
-        todo_t.setTitle(request.POST['title'])
-        todo_t.setDescription(request.POST['description'])
-        todo_t.setCreationDateFromString(request.POST['creationDate'])
-        todo_t.setDueDateFromString(request.POST['dueDate'])
-        todo_t.setStatus(request.POST['status'])
-        todo_t.setTags(request.POST['tags'])
-        todo_t.save()
+        if request.user.has_perm(requiredPerm):
+            todo_t = todo()
+            todo_t.setTitle(request.POST['title'])
+            todo_t.setDescription(request.POST['description'])
+            todo_t.setCreationDateFromString(request.POST['creationDate'])
+            todo_t.setDueDateFromString(request.POST['dueDate'])
+            todo_t.setStatus(request.POST['status'])
+            todo_t.setTags(request.POST['tags'])
+            todo_t.setOwner(request.POST['owner'])
+            todo_t.save()
+        else:
+            return returnForbiddenPriviledge(request,  "Request requires permission: "+requiredPerm)
     else:
-        todo_t = get_object_or_404(todo, pk=todo_id)
-        todo_t.setTitle(request.POST['title'])
-        todo_t.setDescription(request.POST['description'])
-        todo_t.setCreationDateFromString(request.POST['creationDate'])
-        todo_t.setDueDateFromString(request.POST['dueDate'])
-        todo_t.setStatus(request.POST['status'])
-        todo_t.setTags(request.POST['tags'])
-        todo_t.save()
-    return HttpResponseRedirect(reverse('djangoTask:index'))
+        if request.user.has_perm(requiredPerm):
+            todo_t = get_object_or_404(todo, pk=todo_id)
+            todo_t.setTitle(request.POST['title'])
+            todo_t.setDescription(request.POST['description'])
+            todo_t.setCreationDateFromString(request.POST['creationDate'])
+            todo_t.setDueDateFromString(request.POST['dueDate'])
+            todo_t.setStatus(request.POST['status'])
+            todo_t.setTags(request.POST['tags'])
+            todo_t.setOwner(request.POST['owner'])
+            todo_t.save()
+        else:
+            return returnForbiddenPriviledge(request,  "Request requires permission: "+requiredPerm)
+    message_t = "edit complete"
+    return HttpResponseRedirect(reverse('djangoTask:indexM',  kwargs={'message': message_t}))
 
 def deletePost(request):
+    message = None
     try:
         todo_t = get_object_or_404(todo, pk=request.POST['todo_id'])
-        todo_t.delete()
+        requiredPerm = 'djangoTask.delete_todo'
+        if request.user.has_perm(requiredPerm):
+            id_s = todo_t.id
+            todo_t.delete()
+            message = "Deleted Todo with PK:"+str(id_s)
+        else:
+            return returnForbiddenPriviledge(request,  "Request requires permission: "+requiredPerm)
     except:
-        # print("could not get todo_t from "+str(request.POST['todo_id']))
-        pass
-    return HttpResponseRedirect(reverse('djangoTask:index'))
+        message = "Deleted Todo with PK:"+str()
+    return HttpResponseRedirect(reverse('djangoTask:indexM', kwargs={"message":message}))
 
 class todoList(generics.ListCreateAPIView):
     """
@@ -139,9 +178,19 @@ class todoList(generics.ListCreateAPIView):
     """
     queryset = todo.objects.all()
     serializer_class=todoSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    def perform_create(self,serializer):
+        serializer.save(owner=self.request.user)
 class todoDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve, update or delete a code todo.
     """
     queryset = todo.objects.all()
     serializer_class=todoSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer

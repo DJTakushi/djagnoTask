@@ -20,8 +20,23 @@
           <table class="table table-dark table-striped table-hover table-sm">
             <caption>todo fields</caption>
             <tr>
+              <td>ID</td>
+              <td>{{todo_id}}</td>
+            </tr>
+            <tr>
               <td>Title</td>
               <td><input type="text" name="title" id="title" value="{{ todo_title }}"></td>
+            </tr>
+            <tr>
+              <td>Owner</td>
+              <td>
+                <select name="owner">
+                  {% for owner_i in ownerList %}
+                  <option value={{owner_i.id}}>{{owner_i.username}}</option>
+                  {% endfor %}
+                  <option value="">None</option>
+                  </select>
+              </td>
             </tr>
             <tr>
               <td>Description</td>
@@ -54,8 +69,6 @@
         <input type="submit" value="delete">
       </form>
       {% endif %}
-
   </div>
   {% endblock %}
-
   {% block navActive %} "{{ navLink }}" {% endblock %}

@@ -2,6 +2,7 @@ from django.db import models
 import json
 from django.utils import timezone
 from datetime import datetime
+from django.contrib.auth.models import User
 
 def dictToString(context):
     output = ""
@@ -36,34 +37,31 @@ class todoManager(models.Manager):
             todo_t = self.create()
             output += todo_t.setTitle(title_t)
 
-            try:
+            if 'owner' in context:
+                output += todo_t.setOwner(context['owner'])
+
+            if 'description' in context:
                 output += todo_t.setDescription(context['description'])
-            except:
-                output += todo_t.setDescription("")
 
-            try:
+
+            if 'creation_date' in context:
                 output += todo_t.setCreationDateFromString(context['creation_date'])
-            except:
-                output += todo_t.setCreationDate(datetime.now(timezone.utc))
+            # else:
+            #     output += todo_t.setCreationDate(datetime.now(timezone.utc))
 
-            try:
+            if 'due_date' in context:
                 output += todo_t.setDueDateFromString(context['due_date'])
-            except:
-                output +="no due-date specified.  Will remain Null"
 
-            try:
+            if 'status' in context:
                 output += todo_t.setStatus(context['status'])
-            except:
-                output += todo_t.setStatus("open")
 
-            try:
+            if 'tags' in context:
                 output += todo_t.setTags(context['tags'])
-            except:
-                output += todo_t.setTags("")
 
         except:
             output+= "could not create from " + dictToString(context)
-            print("create_todo() failed.")
+            output += "create_todo() failed."
+            print(output)
         # print("output = ", output)
         return output
     def createFromJson(self, inText):
@@ -101,11 +99,12 @@ class todoManager(models.Manager):
 class todo(models.Model):
     title=models.CharField(max_length=200)
     description=models.CharField(max_length=2000, blank=True, null=True)
-    creation_date=models.DateTimeField('date created', blank=True, null=True)
+    creation_date=models.DateTimeField('date created', blank=True, null=True, default=timezone.now)
     due_date=models.DateTimeField('date due', blank=True, null=True)
-    status=models.CharField(max_length=100, blank=True, null=True)
+    status=models.CharField(max_length=100, blank=True, null=True, default="open")
     tags=models.CharField(max_length=200, blank=True, null=True)
     objects = todoManager()
+    owner = models.ForeignKey('auth.User', related_name='todos', on_delete=models.CASCADE,null=True)
 
     def __str__(self):
         return self.title
@@ -122,6 +121,21 @@ class todo(models.Model):
             self.save()
         except:
             output = "could not set title with input " + i
+        return output
+    def setOwner(self,i):
+        output = ""
+        if i == "":
+            i = None
+            print("set i to \"None\".")
+        try:
+            user_t = User.objects.get(id=i)
+            self.owner = user_t
+            print("setting self.owner to "+str(self.owner))
+            self.save()
+        except:
+            output = "could not set owner to " + i
+            print(output)
+        print("self.owner = "+str(self.owner))
         return output
     def setDescription(self,i):
         output = ""
