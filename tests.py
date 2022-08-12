@@ -69,9 +69,8 @@ class index(TestCase):
         self.assertTrue("</table>" in rContent)
         for i in todoList:
             testString = "<a href=\"/todo/"+str(i['id'])+"/\">"+i['title']+"</a>"
-            # print("checking for "+testString)
             if testString not in rContent:
-                print("missing :"+testString)
+                logging.error("missing :"+testString)
             self.assertTrue(testString in rContent)
 
 class new(TestCase):
@@ -101,6 +100,7 @@ class new(TestCase):
 
 class edit(TestCase):
     def test_basicPage(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         createTodoFromExample()
         client = Client()
         response = client.get(BASEURL)
@@ -270,6 +270,7 @@ class editPost(TestCase):
 class importPost(TestCase):
     def test_singleImport(self):
         self.assertEqual(0,len(todo.objects.all()))
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         user_t = User.objects.create_user("testUser", password="abcd")
         content_type = ContentType.objects.get_for_model(todo, for_concrete_model=False)
         permission = Permission.objects.get(codename='add_todo',content_type=content_type,)
@@ -294,6 +295,7 @@ class importPost(TestCase):
 
     def test_multiImport(self):
         # create ten identical items
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         user_t = User.objects.create_user("testUser", password="abcd")
         content_type = ContentType.objects.get_for_model(todo, for_concrete_model=False)
         permission = Permission.objects.get(codename='add_todo',content_type=content_type,)
@@ -338,6 +340,7 @@ class deletePost(TestCase):
         self.assertTrue("<p>No todos are available.</p>" in rContent)
 
     def test_delete(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         user_t = User.objects.create_user("testUser", password="abcd")
         content_type = ContentType.objects.get_for_model(todo, for_concrete_model=False)
         permission = Permission.objects.get(codename='delete_todo',content_type=content_type,)
@@ -370,6 +373,7 @@ class deletePost(TestCase):
 
 class api(TestCase):
     def test_getRoot(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         createTodoFromExample()
         c = Client()
         response = c.get(reverse('djangoTask:api'))
@@ -385,6 +389,7 @@ class api(TestCase):
             self.assertEqual(jsonExample['status'],i['status'])
             self.assertEqual(jsonExample['tags'],i['tags'])
     def test_getItems(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         createTodoFromExample()
         id_t = todo.objects.all()[0].id
         c = Client()
@@ -401,6 +406,7 @@ class api(TestCase):
         # self.assertEqual(jsonExample['due_date'],d['due_date'])
 
     def test_post(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         user_t = User.objects.create_user("testUser", password="abcd")
         content_type = ContentType.objects.get_for_model(todo, for_concrete_model=False)
         permission = Permission.objects.get(codename='add_todo',content_type=content_type,)
@@ -424,6 +430,7 @@ class api(TestCase):
 
 class apiIdx(TestCase):
     def test_get(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         createTodoFromExample()
         c = Client()
         id_t = todo.objects.all()[0].id
@@ -451,6 +458,7 @@ class apiIdx(TestCase):
 
 
     def test_put(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         user_t = User.objects.create_user("testUser", password="abcd")
         content_type = ContentType.objects.get_for_model(todo, for_concrete_model=False)
         permission = Permission.objects.get(codename='add_todo',content_type=content_type,)
@@ -493,6 +501,7 @@ class apiIdx(TestCase):
         self.assertEqual(editDict['tags'], d['tags'])
 
     def test_delete(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         user_t = User.objects.create_user("testUser", password="abcd")
         content_type = ContentType.objects.get_for_model(todo, for_concrete_model=False)
         permission = Permission.objects.get(codename='delete_todo',content_type=content_type,)
