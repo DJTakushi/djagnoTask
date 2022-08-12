@@ -24,6 +24,7 @@ jsonExample['creation_date'] = "2022-07-27T17:00:00+00:00"
 jsonExample['due_date'] = "2022-08-07T17:00:00+00:00"
 jsonExample['status'] = "pending"
 jsonExample['tags'] = "tf69"
+jsonExample['owner'] = "superUser"
 jsonExampleImportString="["+dictToString(jsonExample)+"]"
 # "[{\"title\": \"Sample Title\", \"description\": \"sample description\", \"creation_date\": \"2022-07-27T17:00:00+00:00\", \"due_date\": \"2022-07-27T17:00:00+00:00\", \"status\": \"pending\", \"tags\": \"TF69\"}]"
 
@@ -128,7 +129,7 @@ class todo(models.Model):
             i = None
             print("set i to \"None\".")
         try:
-            user_t = User.objects.get(id=i)
+            user_t = User.objects.get(username=i)
             self.owner = user_t
             print("setting self.owner to "+str(self.owner))
             self.save()
@@ -221,4 +222,5 @@ class todo(models.Model):
             pass
         output['status']=self.status
         output['tags']=self.tags
+        output['owner']=str(self.owner)
         return output
