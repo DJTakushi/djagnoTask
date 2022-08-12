@@ -3,7 +3,7 @@ import json
 from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth.models import User
-
+import logging, warnings
 def dictToString(context):
     output = ""
     try:
@@ -62,24 +62,19 @@ class todoManager(models.Manager):
         except:
             output+= "could not create from " + dictToString(context)
             output += "create_todo() failed."
-            print(output)
-        # print("output = ", output)
+            logging.warning(output)
         return output
     def createFromJson(self, inText):
         output = ""
         try:
-            # print(inText)
             d = json.loads(inText)
-            # print(d)
             objectsOriginal=len(self.all())
             if len(d) > 0:
                 for i in d:
-                    # print(i)
                     output += self.create_todo(i)
             else:
-                print("no valid json objects found")
+                logging.warning("no valid json objects found")
             objectsCreated= len(self.all())-objectsOriginal
-            # print("todo objects:", objectsCreated )
 
             output += " Created "+str(objectsCreated)+" todos"
         except:
@@ -127,16 +122,15 @@ class todo(models.Model):
         output = ""
         if i == "":
             i = None
-            print("set i to \"None\".")
         try:
             user_t = User.objects.get(username=i)
             self.owner = user_t
-            print("setting self.owner to "+str(self.owner))
+            logging.info("setting self.owner to "+str(self.owner))
             self.save()
         except:
             output = "could not set owner to " + i
-            print(output)
-        print("self.owner = "+str(self.owner))
+            logging.warning(output)
+        logging.info("self.owner = "+str(self.owner))
         return output
     def setDescription(self,i):
         output = ""
@@ -160,10 +154,9 @@ class todo(models.Model):
         try:
             dateTime_t = datetime.fromisoformat(i)
             if not(dateTime_t.tzinfo and (dateTime_t.tzinfo.utcoffset(dateTime_t)!=None)):
-                # print(" dateTime_t doesn't look aware")
+                logging.warning(" dateTime_t doesn't look aware")
                 tz_t = "+00:00" #TODO: refine timezones for local lookup
                 dateTime_t = datetime.fromisoformat(i+tz_t)
-                # print("dateTime_t now = ", dateTime_t.isoformat())
             output =  self.setCreationDate(dateTime_t)
         except:
             output += "setCreationDateFromString() failed"
@@ -181,12 +174,10 @@ class todo(models.Model):
         output = ""
         try:
             dateTime_t = datetime.fromisoformat(i)
-            # print("dateTime_t = ", dateTime_t.isoformat())
             if not(dateTime_t.tzinfo and (dateTime_t.tzinfo.utcoffset(dateTime_t)!=None)):
-                # print(" dateTime_t doesn't look aware")
+                logging.warning(" dateTime_t doesn't look aware")
                 tz_t = "+00:00" #TODO: refine timezones for local lookup
                 dateTime_t = datetime.fromisoformat(i+tz_t)
-                # print("dateTime_t now = ", dateTime_t.isoformat())
             output = self.setDueDate(dateTime_t)
         except:
             output += "setDueDateFromString() failed"

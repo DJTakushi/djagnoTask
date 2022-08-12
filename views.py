@@ -27,7 +27,6 @@ def returnForbiddenPriviledge(request, msg = None):
 
 def index(request, message=None):
     todo_list = todo.objects.order_by('creation_date')
-    print("request.user = "+str(request.user))
     template = loader.get_template('djangoTask/index.html')
     context = {
         'latest_todo_list':todo_list,
