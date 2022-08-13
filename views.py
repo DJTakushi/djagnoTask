@@ -16,6 +16,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from rest_framework import permissions
+import logging, warnings
 # from .permissions import IsOwnerOrReadOnly
 def returnForbiddenPriviledge(request, msg = None):
     template = loader.get_template('djangoTask/forbidden.html')
@@ -113,9 +114,8 @@ def detailViewNonGeneric(request, todo_id=None):
         context['todo_status']=todo_t.status
         context['todo_tags']=todo_t.tags
         context['todo_owner']=todo_t.owner
-        context['ownerList']=User.objects.all()
         context['navLink']=""
-
+    context['ownerList']=User.objects.all()
 
     template = loader.get_template('djangoTask/detailNonGeneric.html')
     return HttpResponse(template.render(context,request))
