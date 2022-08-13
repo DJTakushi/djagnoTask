@@ -123,12 +123,14 @@ class todo(models.Model):
         if i == "":
             i = None
         try:
-            user_t = User.objects.get(username=i)
+            user_t = None
+            if i:
+                user_t = User.objects.get(username=i)
             self.owner = user_t
             logging.info("setting self.owner to "+str(self.owner))
             self.save()
         except:
-            output = "could not set owner to " + i
+            output = "could not set owner to " + str(i)
             logging.warning(output)
         logging.info("self.owner = "+str(self.owner))
         return output
