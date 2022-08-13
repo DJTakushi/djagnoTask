@@ -8,7 +8,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission, User
 import json
 from rest_framework import status as statusRF
-BASEURL = "todo/"
 
 def createTodoFromExample():
     todoDict = {}
@@ -22,10 +21,13 @@ def createTodoFromExample():
     todo.objects.create_todo(todoDict)
 
 class index(TestCase):
+    def test_404(self):
+        client = Client()
+        response = client.get("todo/")
+        self.assertEqual(response.status_code, 404)
+
     def test_basicPage(self):
         client = Client()
-        response = client.get(BASEURL)
-        self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:index'))
         self.assertEqual(response.status_code, 200)
         rContent = response.content.decode("utf-8")
@@ -36,6 +38,7 @@ class index(TestCase):
         self.assertFalse("</table>" in rContent)
 
     def test_todoInIndex(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         createTodoFromExample()
         client = Client()
         response = client.get(reverse('djangoTask:index'))
@@ -46,8 +49,6 @@ class index(TestCase):
         self.assertTrue(jsonExample['title'] in rContent)
         self.assertTrue(jsonExample['status'] in rContent)
         self.assertTrue(jsonExample['due_date'][:10] in rContent)
-
-
 
     def test_multipletodosInIndex(self):
         """ create 99 todos and check that they're all in the table """
@@ -76,8 +77,6 @@ class index(TestCase):
 class new(TestCase):
     def test_basicPage(self):
         client = Client()
-        response = client.get(BASEURL)
-        self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:new'))
         self.assertEqual(response.status_code, 200)
         rContent = response.content.decode("utf-8")
@@ -103,8 +102,6 @@ class edit(TestCase):
         superuser_t = User.objects.create_user("superUser", password="abcd")
         createTodoFromExample()
         client = Client()
-        response = client.get(BASEURL)
-        self.assertEqual(response.status_code, 404)
         id_t=todo.objects.all()[0].id # get id from the only existing todo
         url_t = reverse('djangoTask:detail', kwargs={'todo_id': id_t})
         response = client.get(url_t)
@@ -132,8 +129,6 @@ class edit(TestCase):
 class about(TestCase):
     def test_basicPage(self):
         client = Client()
-        response = client.get(BASEURL)
-        self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:about'))
         self.assertEqual(response.status_code, 200)
         rContent = response.content.decode("utf-8")
@@ -143,8 +138,6 @@ class about(TestCase):
 class base(TestCase):
     def test_basicPage(self):
         client = Client()
-        response = client.get(BASEURL)
-        self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:base'))
         self.assertEqual(response.status_code, 200)
         rContent = response.content.decode("utf-8")
@@ -154,8 +147,6 @@ class base(TestCase):
 class importPage(TestCase):
     def test_basicPage(self):
         client = Client()
-        response = client.get(BASEURL)
-        self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:import'))
         self.assertEqual(response.status_code, 200)
         rContent = response.content.decode("utf-8")
@@ -168,8 +159,6 @@ class exportPage(TestCase):
     def test_basicPage(self):
         superuser_t = User.objects.create_user("superUser", password="abcd")
         client = Client()
-        response = client.get(BASEURL)
-        self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:export'))
         self.assertEqual(response.status_code, 200)
         rContent = response.content.decode("utf-8")
@@ -479,11 +468,11 @@ class apiIdx(TestCase):
         response = c.put(url_t,data=editDict,content_type='application/json', follow=True)
         self.assertEqual(404, response.status_code)
 
-
         createTodoFromExample()
         id_t = todo.objects.all()[0].id
-
         url_t = reverse('djangoTask:apiIdx', kwargs={'pk': id_t})
+
+        # unsuccessful Put with garbage date:
         editDict['creation_date'] = "NotARealDate"
         response = c.put(url_t,data=editDict,content_type='application/json', follow=True)
         self.assertEqual(400, response.status_code)

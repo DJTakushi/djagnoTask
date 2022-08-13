@@ -148,18 +148,20 @@ class todo(models.Model):
         except:
             self.creation_date = None
             output = "could not set creation date with input " + i
+            logging.warning(output)
         return output
     def setCreationDateFromString(self,i):
         output = ""
         try:
             dateTime_t = datetime.fromisoformat(i)
             if not(dateTime_t.tzinfo and (dateTime_t.tzinfo.utcoffset(dateTime_t)!=None)):
-                logging.warning(" dateTime_t doesn't look aware")
+                logging.warning(" creationDate doesn't look aware")
                 tz_t = "+00:00" #TODO: refine timezones for local lookup
                 dateTime_t = datetime.fromisoformat(i+tz_t)
             output =  self.setCreationDate(dateTime_t)
         except:
             output += "setCreationDateFromString() failed"
+            logging.warning(output)
         return output
     def setDueDate(self,i):
         output = ""
@@ -175,7 +177,7 @@ class todo(models.Model):
         try:
             dateTime_t = datetime.fromisoformat(i)
             if not(dateTime_t.tzinfo and (dateTime_t.tzinfo.utcoffset(dateTime_t)!=None)):
-                logging.warning(" dateTime_t doesn't look aware")
+                logging.warning(" dueDate doesn't look aware")
                 tz_t = "+00:00" #TODO: refine timezones for local lookup
                 dateTime_t = datetime.fromisoformat(i+tz_t)
             output = self.setDueDate(dateTime_t)
