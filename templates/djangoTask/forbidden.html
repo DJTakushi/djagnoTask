@@ -1,0 +1,17 @@
+{% extends "djangoTask/base.html"  %}
+{% block title %}Forbidden{% endblock %}
+{% block navActive %}"none"{% endblock %}
+{% block content %}
+<div class="container-content">
+  <div class="container-fluid">
+    <h1>Forbidden</h1>
+  </div>
+
+  <div class="container-fluid">
+    <p>Insufficient priveleges to fulfill the request.  Please try again or contact the administrator.<p>
+    {% if message %}
+    {{ message }}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -4,9 +4,10 @@ from django.test.utils import setup_test_environment
 from django.urls import reverse
 from .models import todo, todoManager, jsonExample, dictToString, jsonExampleImportString
 from datetime import datetime
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Permission, User
 import json
 from rest_framework import status as statusRF
-BASEURL = "todo/"
 
 def createTodoFromExample():
     todoDict = {}
@@ -16,13 +17,17 @@ def createTodoFromExample():
     todoDict['due_date']=jsonExample['due_date']
     todoDict['status']=jsonExample['status']
     todoDict['tags']=jsonExample['tags']
+    todoDict['owner']=jsonExample['owner']
     todo.objects.create_todo(todoDict)
 
 class index(TestCase):
+    def test_404(self):
+        client = Client()
+        response = client.get("todo/")
+        self.assertEqual(response.status_code, 404)
+
     def test_basicPage(self):
         client = Client()
-        response = client.get(BASEURL)
-        self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:index'))
         self.assertEqual(response.status_code, 200)
         rContent = response.content.decode("utf-8")
@@ -33,6 +38,7 @@ class index(TestCase):
         self.assertFalse("</table>" in rContent)
 
     def test_todoInIndex(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         createTodoFromExample()
         client = Client()
         response = client.get(reverse('djangoTask:index'))
@@ -43,8 +49,6 @@ class index(TestCase):
         self.assertTrue(jsonExample['title'] in rContent)
         self.assertTrue(jsonExample['status'] in rContent)
         self.assertTrue(jsonExample['due_date'][:10] in rContent)
-
-
 
     def test_multipletodosInIndex(self):
         """ create 99 todos and check that they're all in the table """
@@ -66,16 +70,13 @@ class index(TestCase):
         self.assertTrue("</table>" in rContent)
         for i in todoList:
             testString = "<a href=\"/todo/"+str(i['id'])+"/\">"+i['title']+"</a>"
-            # print("checking for "+testString)
             if testString not in rContent:
-                print("missing :"+testString)
+                logging.error("missing :"+testString)
             self.assertTrue(testString in rContent)
 
 class new(TestCase):
     def test_basicPage(self):
         client = Client()
-        response = client.get(BASEURL)
-        self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:new'))
         self.assertEqual(response.status_code, 200)
         rContent = response.content.decode("utf-8")
@@ -98,10 +99,9 @@ class new(TestCase):
 
 class edit(TestCase):
     def test_basicPage(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         createTodoFromExample()
         client = Client()
-        response = client.get(BASEURL)
-        self.assertEqual(response.status_code, 404)
         id_t=todo.objects.all()[0].id # get id from the only existing todo
         url_t = reverse('djangoTask:detail', kwargs={'todo_id': id_t})
         response = client.get(url_t)
@@ -129,8 +129,6 @@ class edit(TestCase):
 class about(TestCase):
     def test_basicPage(self):
         client = Client()
-        response = client.get(BASEURL)
-        self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:about'))
         self.assertEqual(response.status_code, 200)
         rContent = response.content.decode("utf-8")
@@ -140,8 +138,6 @@ class about(TestCase):
 class base(TestCase):
     def test_basicPage(self):
         client = Client()
-        response = client.get(BASEURL)
-        self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:base'))
         self.assertEqual(response.status_code, 200)
         rContent = response.content.decode("utf-8")
@@ -151,8 +147,6 @@ class base(TestCase):
 class importPage(TestCase):
     def test_basicPage(self):
         client = Client()
-        response = client.get(BASEURL)
-        self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:import'))
         self.assertEqual(response.status_code, 200)
         rContent = response.content.decode("utf-8")
@@ -163,9 +157,8 @@ class importPage(TestCase):
 
 class exportPage(TestCase):
     def test_basicPage(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         client = Client()
-        response = client.get(BASEURL)
-        self.assertEqual(response.status_code, 404)
         response = client.get(reverse('djangoTask:export'))
         self.assertEqual(response.status_code, 200)
         rContent = response.content.decode("utf-8")
@@ -188,7 +181,14 @@ class exportPage(TestCase):
 
 class newPost(TestCase):
     def test_newPost(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
+        user_t = User.objects.create_user("testUser", password="abcd")
+        content_type = ContentType.objects.get_for_model(todo, for_concrete_model=False)
+        permission = Permission.objects.get(codename='add_todo',content_type=content_type,)
+        user_t.user_permissions.add(permission)
         c = Client()
+        c.login(username="testUser", password="abcd")
+
         postContent = jsonExample
         postContent['creationDate']= jsonExample['creation_date'][:16]
         postContent['dueDate']= jsonExample['due_date'][:16]
@@ -209,9 +209,17 @@ class newPost(TestCase):
         self.assertEqual(jsonExample['creation_date'], todo_t.creation_date.isoformat())
         self.assertEqual(jsonExample['status'], todo_t.status)
         self.assertEqual(jsonExample['tags'], todo_t.tags)
+        self.assertEqual(jsonExample['owner'], todo_t.owner.username)
 
 class editPost(TestCase):
     def test_editPost(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
+        user_t = User.objects.create_user("testUser", password="abcd")
+        content_type = ContentType.objects.get_for_model(todo, for_concrete_model=False)
+        permission = Permission.objects.get(codename='add_todo',content_type=content_type,)
+        user_t.user_permissions.add(permission)
+        permission = Permission.objects.get(codename='change_todo',content_type=content_type,)
+        user_t.user_permissions.add(permission)
         createTodoFromExample()
 
         editDict = {}
@@ -221,9 +229,11 @@ class editPost(TestCase):
         editDict['creationDate'] = "2050-01-01T12:00:00"
         editDict['status'] = "newStatus"
         editDict['tags'] = "newTag1 newTag2"
+        editDict['owner'] = "testUser"
 
 
         c = Client()
+        c.login(username="testUser", password="abcd")
         postContent = jsonExample
         id_t = todo.objects.all()[0].id
         response= c.post(reverse('djangoTask:editPost', kwargs={'todo_id': id_t}), editDict, follow=True)
@@ -243,14 +253,23 @@ class editPost(TestCase):
         self.assertEqual(editDict['creationDate']+"+00:00", todo_t.creation_date.isoformat())
         self.assertEqual(editDict['status'], todo_t.status)
         self.assertEqual(editDict['tags'], todo_t.tags)
+        self.assertEqual(editDict['owner'], todo_t.owner.username)
 
 
 class importPost(TestCase):
     def test_singleImport(self):
         self.assertEqual(0,len(todo.objects.all()))
+        superuser_t = User.objects.create_user("superUser", password="abcd")
+        user_t = User.objects.create_user("testUser", password="abcd")
+        content_type = ContentType.objects.get_for_model(todo, for_concrete_model=False)
+        permission = Permission.objects.get(codename='add_todo',content_type=content_type,)
+        user_t.user_permissions.add(permission)
+
+
         postDict = {}
         postDict['inData']=jsonExampleImportString
         c = Client()
+        c.login(username="testUser", password="abcd")
         response= c.post(reverse('djangoTask:import'), postDict, follow=True)
 
         self.assertEqual(1,len(todo.objects.all()))
@@ -265,6 +284,11 @@ class importPost(TestCase):
 
     def test_multiImport(self):
         # create ten identical items
+        superuser_t = User.objects.create_user("superUser", password="abcd")
+        user_t = User.objects.create_user("testUser", password="abcd")
+        content_type = ContentType.objects.get_for_model(todo, for_concrete_model=False)
+        permission = Permission.objects.get(codename='add_todo',content_type=content_type,)
+        user_t.user_permissions.add(permission)
         items=10
         self.assertEqual(0,len(todo.objects.all()))
         postDict = {}
@@ -276,6 +300,7 @@ class importPost(TestCase):
         extendedString+="]"
         postDict['inData']=extendedString
         c = Client()
+        c.login(username="testUser", password="abcd")
         response= c.post(reverse('djangoTask:import'), postDict, follow=True)
 
         self.assertEqual(items,len(todo.objects.all()))
@@ -304,11 +329,18 @@ class deletePost(TestCase):
         self.assertTrue("<p>No todos are available.</p>" in rContent)
 
     def test_delete(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
+        user_t = User.objects.create_user("testUser", password="abcd")
+        content_type = ContentType.objects.get_for_model(todo, for_concrete_model=False)
+        permission = Permission.objects.get(codename='delete_todo',content_type=content_type,)
+        user_t.user_permissions.add(permission)
+
         #add a todo
         createTodoFromExample()
 
         # check that the todo shows up in the index
         c = Client()
+        c.login(username="testUser", password="abcd")
         response = c.get(reverse('djangoTask:index'))
         rContent = response.content.decode("utf-8")
         self.assertTrue("</table>" in rContent)
@@ -330,6 +362,7 @@ class deletePost(TestCase):
 
 class api(TestCase):
     def test_getRoot(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         createTodoFromExample()
         c = Client()
         response = c.get(reverse('djangoTask:api'))
@@ -345,6 +378,7 @@ class api(TestCase):
             self.assertEqual(jsonExample['status'],i['status'])
             self.assertEqual(jsonExample['tags'],i['tags'])
     def test_getItems(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         createTodoFromExample()
         id_t = todo.objects.all()[0].id
         c = Client()
@@ -361,7 +395,14 @@ class api(TestCase):
         # self.assertEqual(jsonExample['due_date'],d['due_date'])
 
     def test_post(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
+        user_t = User.objects.create_user("testUser", password="abcd")
+        content_type = ContentType.objects.get_for_model(todo, for_concrete_model=False)
+        permission = Permission.objects.get(codename='add_todo',content_type=content_type,)
+        user_t.user_permissions.add(permission)
+
         c = Client()
+        c.login(username="testUser", password="abcd")
         editDict = {}
         editDict['title'] = "changed title"
         editDict['creation_date'] = "2050-01-01T12:00:00+0000"
@@ -378,6 +419,7 @@ class api(TestCase):
 
 class apiIdx(TestCase):
     def test_get(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
         createTodoFromExample()
         c = Client()
         id_t = todo.objects.all()[0].id
@@ -405,6 +447,11 @@ class apiIdx(TestCase):
 
 
     def test_put(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
+        user_t = User.objects.create_user("testUser", password="abcd")
+        content_type = ContentType.objects.get_for_model(todo, for_concrete_model=False)
+        permission = Permission.objects.get(codename='add_todo',content_type=content_type,)
+        user_t.user_permissions.add(permission)
         editDict = {}
         editDict['title'] = "changed title"
         editDict['creation_date'] = "2020-01-01T01:01:00+0000"
@@ -413,6 +460,7 @@ class apiIdx(TestCase):
         editDict['status'] = "new status"
         editDict['tags'] = "new tags"
         c = Client()
+        c.login(username="testUser", password="abcd")
 
         # Invalid ID
         url_t = reverse('djangoTask:apiIdx', kwargs={'pk': 0})
@@ -420,11 +468,11 @@ class apiIdx(TestCase):
         response = c.put(url_t,data=editDict,content_type='application/json', follow=True)
         self.assertEqual(404, response.status_code)
 
-
         createTodoFromExample()
         id_t = todo.objects.all()[0].id
-
         url_t = reverse('djangoTask:apiIdx', kwargs={'pk': id_t})
+
+        # unsuccessful Put with garbage date:
         editDict['creation_date'] = "NotARealDate"
         response = c.put(url_t,data=editDict,content_type='application/json', follow=True)
         self.assertEqual(400, response.status_code)
@@ -442,8 +490,14 @@ class apiIdx(TestCase):
         self.assertEqual(editDict['tags'], d['tags'])
 
     def test_delete(self):
+        superuser_t = User.objects.create_user("superUser", password="abcd")
+        user_t = User.objects.create_user("testUser", password="abcd")
+        content_type = ContentType.objects.get_for_model(todo, for_concrete_model=False)
+        permission = Permission.objects.get(codename='delete_todo',content_type=content_type,)
+        user_t.user_permissions.add(permission)
         createTodoFromExample()
         c = Client()
+        c.login(username="testUser", password="abcd")
         id_t = todo.objects.all()[0].id
         url_t = reverse('djangoTask:apiIdx', kwargs={'pk': id_t})
         response = c.delete(url_t, follow=True)

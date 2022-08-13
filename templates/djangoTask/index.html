@@ -4,11 +4,15 @@
 {% block content %}
 {% if latest_todo_list %}
 <div class="container-fluid">
+  <div class="container-fluid">
+    <p>{{ message }}</p>
+  </div>
   <table class="table table-dark table-striped table-hover table-sm">
     <thead>
       <tr>
         <th>id</th>
         <th>title</th>
+        <th>owner</th>
         <th>status</th>
         <th>due date</th>
         <th></th>
@@ -23,6 +27,7 @@
         {% else %}
         <td><a href="{% url 'djangoTask:detail' todo.id %}">(no title)</a></td>
         {% endif %}
+        <td>{{ todo.owner}}</td>
         <td>{{ todo.status}}</td>
         <td>{{ todo.due_date.date.isoformat }}</td>
         <td>
