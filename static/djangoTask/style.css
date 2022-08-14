@@ -1,3 +1,23 @@
+.theme-light {
+  --color-primary: #DEEDFF;
+  --color-secondary: #FFFFFF;
+
+  --color-menu: AliceBlue;
+  --color-menu-font: MidnightBlue;
+
+  --color-accent: orange;
+  --font-color: #000000;
+}
+.theme-dark {
+  --color-primary: #0c0d13; /* dark navy */
+  --color-secondary: #0d1d31; /* navy */
+
+  --color-menu: #343a40; /* original in bg-dark */;
+  --color-menu-font: #AfCfff; /* Came up with it */
+
+  --color-accent: orange;
+  --font-color: #ffffff;
+}
 /* body { */
 /* background-image: linear-gradient(navy,purple); */
 /* } */
@@ -12,13 +32,24 @@ body {
   /* background: rgb(2,0,36); */
   /* cool gradient generated from https://cssgradient.io/ */
   --tcb: rgb(2, 0, 36);
-  --cGradient1: rgba(2, 0, 36, 1);
+  /* --cGradient1: rgba(2, 0, 36, 1);
   --cGradient2: rgba(9, 9, 121, 1);
-  --cGradient3: rgba(0, 212, 255, 1);
+  --cGradient3: rgba(0, 212, 255, 1); */
   /* background: var(--tcb); */
   /* background: linear-gradient(-45deg, var(--cGradient1) 0%, var(--cGradient2) 35%, var(--cGradient3) 100%); */
+  background: radial-gradient(ellipse at bottom, var(--color-secondary) 0%, var(--color-primary) 100%);
+  color: var(--font-color);
 }
+p {
+  background-color: var(--color-secondary);
+  opacity: .9;
+  padding: 15px;
+  border-radius:10px;
+}
+.table{
+  background-color:var(--color-menu);
 
+}
 /* https://www.w3schools.com/css/tryit.asp?filename=trycss_link_advanced */
 .t:link, .t:visited {
   background-color: #f44336;
@@ -37,22 +68,24 @@ body {
   padding: 10px;
 
   box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.06), 0 1px 0 0 rgba(0, 0, 0, 0.02);
+  background-color: var(--color-menu);
 }
 .nav-link{
   border-radius: 5px;
+  color: var(--color-menu-font);
 }
 .nav-link-active{
   border-radius: 5px;
-  background-color:orange;
+  background-color: var(--color-accent);
 }
 .nav-link:hover{
-  background-color:orange;
+  background-color: var(--color-accent);
 }
 .container-content{
   z-index: 1;
   opacity:.9;
   padding: 10px;
-  background-color: #fff;
+  background-color: var(--color-primary);
   box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.06), 0 1px 0 0 rgba(0, 0, 0, 0.02);
 }
 .background {
