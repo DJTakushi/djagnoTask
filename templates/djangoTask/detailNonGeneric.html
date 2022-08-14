@@ -31,10 +31,10 @@
               <td>Owner</td>
               <td>
                 <select name="owner">
+                  <option selected="">none</option>
                   {% for owner_i in ownerList %}
                   <option value={{owner_i.username}}>{{owner_i.username}}</option>
                   {% endfor %}
-                  <option value="">None</option>
                   </select>
               </td>
             </tr>
