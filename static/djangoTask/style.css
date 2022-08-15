@@ -27,7 +27,7 @@ body {
   /* background-image: linear-gradient(to bottom right, rgba(127,0,0,1), rgba(127,127,0,1)); */
   /* background-image: linear-gradient(to right, rgba(255,0,0,0), rgba(255,0,0,1)); */
   /* https://www.w3schools.com/css/css3_gradients.asp */
-  Height: 100vh;
+  height: 100vh;
   /*https://www.reddit.com/r/css/comments/a6g2tx/how_do_i_create_a_gradient_background_that/ */
   /* background: rgb(2,0,36); */
   /* cool gradient generated from https://cssgradient.io/ */
@@ -48,7 +48,6 @@ p {
 }
 .table{
   background-color:var(--color-menu);
-
 }
 /* https://www.w3schools.com/css/tryit.asp?filename=trycss_link_advanced */
 .t:link, .t:visited {
@@ -95,7 +94,10 @@ p {
   left: 0;
   z-index: -1;
 }
-
+.t_overflow{
+  height:100vh;
+  overflow:auto;
+}
 
 .containerParticle {
   /* max-width: 500px; */
